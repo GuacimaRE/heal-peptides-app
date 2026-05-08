@@ -223,14 +223,14 @@ select option{background:#1a1a28}
  <div id="home-add-box" style="display:none;background:#0f0f1a;border-radius:13px;padding:12px;border:0.5px dashed rgba(26,111,196,.4)">
  <div style="font-size:12px;color:#3aa0ff;font-weight:600;margin-bottom:8px">Add a peptide</div>
  <select id="home-pep-select" onchange="autofillHome()" style="width:100%;background:#1a1a28;border:0.5px solid rgba(255,255,255,.1);border-radius:9px;color:#fff;padding:8px 12px;font-size:13px;outline:none;font-family:'Inter',sans-serif;-webkit-appearance:none;margin-bottom:8px">
- <option>BPC-157</option><option>TB-500</option><option>GHK-Cu</option>
- <option>Glow Blend</option><option>Ipamorelin / CJC blend</option>
- <option>MOTS-C</option><option>Semax</option><option>Selank</option>
- <option>Tesamorelin</option><option>Semaglutide</option><option>Tirzepatide</option>
- <option>Retatrutide</option><option>Epithalon</option><option>SS-31</option>
- <option>NAD+</option><option>KPV</option><option>PT-141</option>
- <option>AOD9604</option><option>SLU-PP-332</option><option>5-Amino-1MQ</option>
- <option>Thymosin Alpha-1</option><option>HGH</option><option>Oxytocin</option>
+ <optgroup label="GLP-1 / Weight"><option>Tirzepatide</option><option>Retatrutide</option><option>Mazdutide</option><option>Cagrilintide</option><option>Semaglutide</option></optgroup>
+ <optgroup label="Recovery"><option>BPC-157</option><option>TB-500</option><option>GHK-Cu</option><option>IGF-1 LR3</option><option>AOD9604</option></optgroup>
+ <optgroup label="GH / Anti-aging"><option>Ipamorelin</option><option>CJC-1295 (no DAC)</option><option>CJC-1295 DAC</option><option>Ipamorelin / CJC blend</option><option>Sermorelin</option><option>Tesamorelin</option><option>GHRP-2</option><option>Epithalon</option></optgroup>
+ <optgroup label="Cognitive"><option>Semax</option><option>Selank</option></optgroup>
+ <optgroup label="Metabolic"><option>MOTS-C</option><option>5-Amino-1MQ</option></optgroup>
+ <optgroup label="Immune"><option>Thymosin Alpha-1</option><option>LL-37</option></optgroup>
+ <optgroup label="Other"><option>PT-141</option><option>Melanotan II</option></optgroup>
+ <optgroup label="Blends"><option>Glow Blend</option><option>Klow Blend</option></optgroup>
  </select>
  <input type="text" id="home-pep-detail" placeholder="Dose & notes (e.g. 250mcg · Daily · AM)" style="width:100%;background:#1a1a28;border:0.5px solid rgba(255,255,255,.1);border-radius:9px;color:#fff;padding:8px 12px;font-size:13px;outline:none;font-family:'Inter',sans-serif;margin-bottom:8px">
  <button onclick="homeAddPeptide()" style="background:#1a6fc4;color:#fff;border:none;border-radius:9px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;width:100%">+ Add</button>
@@ -347,15 +347,34 @@ select option{background:#1a1a28}
  <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Add a peptide</div>
  <span class="lbl" style="margin-top:0">Peptide</span>
  <select id="cp-name" onchange="autofillPeptide('cp-name','cp-dose','cp-freq','cp-notes')">
- <option>BPC-157</option><option>TB-500</option><option>GHK-Cu</option><option>Glow Blend</option>
- <option>Ipamorelin</option><option>CJC-1295 (no DAC)</option><option>Ipamorelin / CJC blend</option>
- <option>MOTS-C</option><option>Semax</option><option>Selank</option><option>Tesamorelin</option>
- <option>Semaglutide</option><option>Tirzepatide</option><option>Retatrutide</option>
- <option>Epithalon</option><option>SS-31</option><option>NAD+</option><option>KPV</option>
- <option>PT-141</option><option>AOD9604</option><option>5-Amino-1MQ</option><option>SLU-PP-332</option>
- <option>Melanotan I</option><option>Oxytocin</option><option>Klow Blend</option>
- <option>Thymosin Alpha-1</option><option>HGH</option><option>IGF-1 LR3</option>
- <option>Glutathione</option><option>L-Carnitine</option>
+ <optgroup label="GLP-1 / Weight">
+  <option>Tirzepatide</option><option>Retatrutide</option><option>Mazdutide</option>
+  <option>Cagrilintide</option><option>Semaglutide</option>
+ </optgroup>
+ <optgroup label="Recovery / Healing">
+  <option>BPC-157</option><option>TB-500</option><option>GHK-Cu</option>
+  <option>IGF-1 LR3</option><option>AOD9604</option>
+ </optgroup>
+ <optgroup label="GH / Anti-aging">
+  <option>Ipamorelin</option><option>CJC-1295 (no DAC)</option><option>CJC-1295 DAC</option>
+  <option>Ipamorelin / CJC blend</option><option>Sermorelin</option>
+  <option>Tesamorelin</option><option>GHRP-2</option><option>Epithalon</option>
+ </optgroup>
+ <optgroup label="Cognitive / Mood">
+  <option>Semax</option><option>Selank</option>
+ </optgroup>
+ <optgroup label="Metabolic / Energy">
+  <option>MOTS-C</option><option>5-Amino-1MQ</option>
+ </optgroup>
+ <optgroup label="Immune">
+  <option>Thymosin Alpha-1</option><option>LL-37</option>
+ </optgroup>
+ <optgroup label="Other">
+  <option>PT-141</option><option>Melanotan II</option>
+ </optgroup>
+ <optgroup label="Blends">
+  <option>Glow Blend</option><option>Klow Blend</option>
+ </optgroup>
  </select>
  <div id="pep-suggestion" style="display:none;background:#0a1628;border:0.5px solid #1a4a80;border-radius:10px;padding:10px 12px;margin-bottom:4px">
  <div style="font-size:10px;color:#3aa0ff;font-weight:600;margin-bottom:4px">SUGGESTED PROTOCOL</div>
@@ -458,13 +477,49 @@ select option{background:#1a1a28}
  <h3>Add new vial</h3>
  <span class="lbl">Peptide</span>
  <select id="av-name" onchange="av_onPeptideChange()">
- <option value="BPC-157|10">BPC-157 10mg</option><option value="TB-500|10">TB-500 10mg</option><option value="GHK-Cu|50">GHK-Cu 50mg</option>
- <option value="Glow Blend|70">Glow Blend 70mg</option><option value="Klow Blend|80">Klow Blend 80mg</option><option value="Ipamorelin/CJC|10">Ipamorelin/CJC 10mg</option>
- <option value="MOTS-C|10">MOTS-C 10mg</option><option value="Tesamorelin|10">Tesamorelin 10mg</option><option value="Semaglutide|10">Semaglutide 10mg</option>
- <option value="Tirzepatide|15">Tirzepatide 15mg</option><option value="Retatrutide|20">Retatrutide 20mg</option><option value="Epithalon|10">Epithalon 10mg</option>
- <option value="SS-31|10">SS-31 10mg</option><option value="NAD+|500">NAD+ 500mg</option><option value="Selank|10">Selank 10mg</option>
- <option value="Semax|10">Semax 10mg</option><option value="KPV|10">KPV 10mg</option><option value="PT-141|10">PT-141 10mg</option>
- <option value="AOD9604|10">AOD9604 10mg</option><option value="SLU-PP-332|10">SLU-PP-332 10mg</option><option value="5-Amino-1MQ|10">5-Amino-1MQ 10mg</option>
+ <optgroup label="GLP-1 / Weight">
+  <option value="Tirzepatide|10">Tirzepatide 10mg</option><option value="Tirzepatide|5">Tirzepatide 5mg</option>
+  <option value="Retatrutide|10">Retatrutide 10mg</option><option value="Retatrutide|5">Retatrutide 5mg</option>
+  <option value="Mazdutide|10">Mazdutide 10mg</option><option value="Mazdutide|5">Mazdutide 5mg</option>
+  <option value="Cagrilintide|10">Cagrilintide 10mg</option><option value="Cagrilintide|5">Cagrilintide 5mg</option>
+  <option value="Semaglutide|10">Semaglutide 10mg</option>
+ </optgroup>
+ <optgroup label="Recovery">
+  <option value="BPC-157|5">BPC-157 5mg</option><option value="BPC-157|15">BPC-157 15mg</option>
+  <option value="TB-500|2">TB-500 2mg</option><option value="TB-500|5">TB-500 5mg</option>
+  <option value="GHK-Cu|50">GHK-Cu 50mg</option>
+  <option value="IGF-1 LR3|1">IGF-1 LR3 1mg</option>
+  <option value="AOD9604|2">AOD9604 2mg</option>
+ </optgroup>
+ <optgroup label="GH / Anti-aging">
+  <option value="Ipamorelin|2">Ipamorelin 2mg</option><option value="Ipamorelin|5">Ipamorelin 5mg</option>
+  <option value="CJC-1295 (no DAC)|2">CJC-1295 (no DAC) 2mg</option><option value="CJC-1295 (no DAC)|5">CJC-1295 (no DAC) 5mg</option>
+  <option value="CJC-1295 DAC|2">CJC-1295 DAC 2mg</option>
+  <option value="Sermorelin|2">Sermorelin 2mg</option><option value="Sermorelin|5">Sermorelin 5mg</option>
+  <option value="Tesamorelin|2">Tesamorelin 2mg</option>
+  <option value="GHRP-2|5">GHRP-2 5mg</option><option value="GHRP-2|10">GHRP-2 10mg</option>
+  <option value="Epithalon|10">Epithalon 10mg</option>
+ </optgroup>
+ <optgroup label="Cognitive">
+  <option value="Semax|10">Semax 10mg</option>
+  <option value="Selank|5">Selank 5mg</option>
+ </optgroup>
+ <optgroup label="Metabolic">
+  <option value="MOTS-C|10">MOTS-C 10mg</option>
+  <option value="5-Amino-1MQ|5">5-Amino-1MQ 5mg</option>
+ </optgroup>
+ <optgroup label="Immune">
+  <option value="Thymosin Alpha-1|2">Thymosin Alpha-1 2mg</option>
+  <option value="LL-37|5">LL-37 5mg</option>
+ </optgroup>
+ <optgroup label="Other">
+  <option value="PT-141|10">PT-141 10mg</option>
+  <option value="Melanotan II|10">Melanotan II 10mg</option>
+ </optgroup>
+ <optgroup label="Blends">
+  <option value="Glow Blend|70">Glow Blend 70mg</option>
+  <option value="Klow Blend|80">Klow Blend 80mg</option>
+ </optgroup>
  </select>
 
  <div class="row2" style="margin-top:10px">
@@ -496,52 +551,95 @@ select option{background:#1a1a28}
 <div class="toast" id="toast"></div>
 
 <script>
+// =========================================================
+// PROTOCOLS (BioVantix Peptides Dosing Guide)
+// =========================================================
 const TITRATION_PROTOCOLS={
- 'BPC-157':{vialMg:10,bacMl:2,isMcg:true,intro:'Body Protection Compound. Daily SubQ near injury or abdomen. 4-8 week cycles, 4 weeks off.',schedule:[{weeks:'Standard dose',dose:500,freq:'Once daily',label:'500mcg (10 units)'},{weeks:'Intensive recovery',dose:500,freq:'Twice daily',label:'500mcg AM + 500mcg PM (10 units x2)'}],notes:'SubQ as close to injury as possible, or abdomen for systemic effect. AM injection or post-workout. Cycle 4-8 weeks on, 4 weeks off.',warning:'10mg vial + 2mL BAC water = 5,000mcg/mL. 500mcg = 10 units on U-100 syringe.'},
+ // ——— GLP-1 / Weight ———
+ 'Tirzepatide':{vialMg:10,bacMl:2,intro:'Dual GIP/GLP-1 agonist. Titrate weekly. BioVantix protocol caps at 5mg/wk.',schedule:[{weeks:'Week 1–4',dose:2.5,freq:'Once weekly',label:'2.5mg — Starting (50u with 10mg+2mL)'},{weeks:'Week 5+',dose:5,freq:'Once weekly',label:'5mg — Maintenance / Max (100u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. 5mg/wk is BioVantix max dose. Do not exceed.'},
+ 'Retatrutide':{vialMg:10,bacMl:2,intro:'Triple GLP-1/GIP/Glucagon agonist. Strongest GLP-1 class peptide.',schedule:[{weeks:'Week 1–4',dose:2,freq:'Once weekly',label:'2mg — Starting (40u with 10mg+2mL)'},{weeks:'Week 5+',dose:4,freq:'Once weekly',label:'4mg — Max (80u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. BioVantix max 4mg/wk. Never skip titration.'},
+ 'Mazdutide':{vialMg:10,bacMl:2,intro:'GLP-1/Glucagon dual agonist. Once weekly. Promising weight & metabolic results.',schedule:[{weeks:'Week 1–4',dose:2,freq:'Once weekly',label:'2mg — Starting (40u)'},{weeks:'Week 5+',dose:4,freq:'Once weekly',label:'4mg — Max (80u)'}],notes:'SubQ — same day each week (Monday recommended).',warning:'Vial 10mg + 2mL BAC = 5mg/mL. BioVantix max 4mg/wk.'},
+ 'Cagrilintide':{vialMg:10,bacMl:2,intro:'Long-acting amylin analog. Pairs with GLP-1s for synergy.',schedule:[{weeks:'Week 1–2',dose:0.25,freq:'Once weekly',label:'0.25mg — Starter (5u)'},{weeks:'Week 3–4',dose:0.5,freq:'Once weekly',label:'0.5mg (10u)'},{weeks:'Week 5–6',dose:1,freq:'Once weekly',label:'1mg (20u)'},{weeks:'Week 7–8',dose:2,freq:'Once weekly',label:'2mg (40u)'},{weeks:'Week 9+',dose:4.5,freq:'Once weekly',label:'4.5mg — Max (90u)'}],notes:'SubQ — same day each week. Can stack with Semaglutide or Tirzepatide.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. Escalate by 0.5–1mg/wk.'},
+ 'Semaglutide':{vialMg:10,bacMl:2,intro:'GLP-1 receptor agonist. Weekly injection. Gradual titration over 3–4 months.',schedule:[{weeks:'Week 1–4',dose:0.25,freq:'Once weekly',label:'0.25mg (5u)'},{weeks:'Week 5–8',dose:0.5,freq:'Once weekly',label:'0.5mg (10u)'},{weeks:'Week 9–12',dose:1.0,freq:'Once weekly',label:'1.0mg (20u)'},{weeks:'Week 13+',dose:1.7,freq:'Once weekly',label:'1.7mg (34u)'},{weeks:'Maintenance',dose:2.4,freq:'Once weekly',label:'2.4mg max (48u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. Nausea common at start. Stay hydrated.'},
 
- 'Retatrutide':{vialMg:20,bacMl:2,intro:'Triple GLP-1/GIP/Glucagon agonist. Phase 2 trial (NEJM 2023) showed up to 24.2% weight loss at 48 weeks. Strict titration required.',schedule:[{weeks:'Week 1–4',dose:2,freq:'Once weekly',label:'2mg — Starting dose'},{weeks:'Week 5–12',dose:4,freq:'Once weekly',label:'4mg — Titration'},{weeks:'Week 13–24',dose:8,freq:'Once weekly',label:'8mg — Standard'},{weeks:'Week 25+',dose:12,freq:'Once weekly',label:'12mg — Max (if tolerated)'}],notes:'SubQ — abdomen, thigh or upper arm. Any time of day, with or without food. Same day each week.',warning:'~30x more potent per mg than Semaglutide. Never skip titration steps. Monitor for nausea, hold dose 1–2 weeks if needed before advancing.'},
- 'GHK-Cu':{vialMg:50,bacMl:2,intro:'Copper peptide. Reconstituted at 25mg/mL for compact dosing. Effects plateau — more is not better.',schedule:[{weeks:'Week 1–2',dose:0.5,freq:'Daily or 3x/week',label:'0.5mg — Starter / Sensitivity'},{weeks:'Week 3–4',dose:1,freq:'Daily or 3x/week',label:'1mg — Starter (full)'},{weeks:'Week 5–8',dose:1,freq:'Daily or 5x/week',label:'1mg — Standard maintenance'},{weeks:'Week 9+',dose:2,freq:'Daily',label:'2mg — Advanced / Escalated'}],notes:'SubQ — abdomen, before bed preferred. 50mg + 2mL BAC = 25mg/mL. Cycle 30 days on / 30 days off recommended.',warning:'Copper accumulation possible with long-term high-dose use. Take breaks. Effects plateau above 2mg/day.'},
- 'Semaglutide':{vialMg:10,bacMl:2,intro:'GLP-1 receptor agonist. Weekly injection. Gradual titration over 3–4 months.',schedule:[{weeks:'Week 1–4',dose:0.25,freq:'Once weekly',label:'0.25mg'},{weeks:'Week 5–8',dose:0.5,freq:'Once weekly',label:'0.5mg'},{weeks:'Week 9–12',dose:1.0,freq:'Once weekly',label:'1.0mg'},{weeks:'Week 13+',dose:1.7,freq:'Once weekly',label:'1.7mg'},{weeks:'Maintenance',dose:2.4,freq:'Once weekly',label:'2.4mg (max)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week. Can take with or without food.',warning:'Nausea common at start. Stay hydrated. Do not rush dose increases.'},
- 'Tirzepatide':{vialMg:15,bacMl:2,intro:'Dual GIP/GLP-1 agonist. More potent than Semaglutide. Titrate carefully over 4–5 months.',schedule:[{weeks:'Week 1–4',dose:2.5,freq:'Once weekly',label:'2.5mg'},{weeks:'Week 5–8',dose:5.0,freq:'Once weekly',label:'5mg'},{weeks:'Week 9–12',dose:7.5,freq:'Once weekly',label:'7.5mg'},{weeks:'Week 13+',dose:10,freq:'Once weekly',label:'10mg (maintenance)'},{weeks:'Advanced',dose:15,freq:'Once weekly',label:'15mg (max dose)'}],notes:'SubQ — abdomen, thigh or upper arm. Rotate injection sites weekly.',warning:'Always start at 2.5mg regardless of body weight. Never rush titration.'},
+ // ——— Recovery / Healing ———
+ 'BPC-157':{vialMg:5,bacMl:2.5,intro:'Body Protection Compound. SubQ near injury or abdomen. 4–6 week cycles.',schedule:[{weeks:'5mg vial',dose:0.3,freq:'Daily',label:'300mcg (15u with 5mg+2.5mL)'},{weeks:'15mg vial',dose:0.5,freq:'Daily',label:'500mcg (10u with 15mg+3mL)'}],notes:'SubQ as close to injury as possible, or abdomen for systemic effect. 5 days on / 2 days off, 4–6 weeks per cycle.',warning:'5mg + 2.5mL BAC = 2mg/mL. 15mg + 3mL BAC = 5mg/mL.'},
+ 'TB-500':{vialMg:5,bacMl:2.5,intro:'Tissue regeneration peptide. Pairs well with BPC-157 for recovery.',schedule:[{weeks:'2mg vial',dose:0.1,freq:'Daily',label:'100–200mcg (10–20u with 2mg+2mL)'},{weeks:'5mg vial',dose:0.2,freq:'Daily',label:'200–400mcg (10–20u with 5mg+2.5mL)'}],notes:'SubQ or IM. 5 days on / 2 days off, 4–5 weeks per cycle.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
+ 'GHK-Cu':{vialMg:50,bacMl:3,intro:'Copper peptide. Skin & hair regeneration. Reconstitute at 16.7mg/mL.',schedule:[{weeks:'Standard',dose:0.835,freq:'Daily or 5x/week',label:'835mcg (5u with 50mg+3mL)'},{weeks:'Advanced',dose:1.666,freq:'Daily',label:'1666mcg (10u)'}],notes:'SubQ — abdomen or scalp area. 5 on / 2 off, 6 weeks on / 2 weeks off cycle.',warning:'50mg + 3mL BAC = 16.7mg/mL. Effects plateau above 2mg/day.'},
+ 'IGF-1 LR3':{vialMg:1,bacMl:2.5,intro:'Long-acting IGF-1 analog. Tissue growth and recovery.',schedule:[{weeks:'Standard',dose:0.04,freq:'Daily',label:'40–80mcg (10–20u with 1mg+2.5mL)'}],notes:'SubQ — 5 days on / 2 days off, 2.5–5 weeks per cycle.',warning:'1mg + 2.5mL BAC = 0.4mg/mL.'},
+ 'AOD9604':{vialMg:2,bacMl:2,intro:'GH fragment for fat loss. No effect on blood sugar or IGF-1.',schedule:[{weeks:'Standard',dose:0.3,freq:'Daily',label:'300mcg (30u with 2mg+2mL)'}],notes:'SubQ AM fasted. 5 days on / 2 days off, 6 weeks per cycle.',warning:'2mg + 2mL BAC = 1mg/mL.'},
+
+ // ——— GH / Anti-aging ———
+ 'Ipamorelin':{vialMg:5,bacMl:2.5,intro:'Selective GH releaser. Cleanest GHRP — no cortisol or prolactin spike.',schedule:[{weeks:'Standard',dose:0.2,freq:'Daily',label:'200mcg (10u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. Stack with CJC-1295 for synergy.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
+ 'CJC-1295 (no DAC)':{vialMg:5,bacMl:2.5,intro:'GHRH analog. Pairs with Ipamorelin for natural GH pulse.',schedule:[{weeks:'Standard',dose:0.1,freq:'Daily',label:'100–200mcg (10–20u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. 5 on / 2 off recommended.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
+ 'CJC-1295 DAC':{vialMg:2,bacMl:2,intro:'Long-acting CJC. Twice weekly only — do NOT take daily.',schedule:[{weeks:'Standard',dose:0.1,freq:'2x per week',label:'100mcg (20u with 2mg+2mL)'},{weeks:'Higher',dose:0.3,freq:'2x per week',label:'300mcg (30u)'}],notes:'SubQ — Monday & Thursday for example. Long half-life means continuous GH bump.',warning:'2mg + 2mL BAC = 1mg/mL. Never daily — desensitization risk.'},
+ 'Sermorelin':{vialMg:5,bacMl:2.5,intro:'GHRH analog — promotes natural GH release.',schedule:[{weeks:'Standard',dose:0.2,freq:'Daily',label:'200mcg (10u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. 5 on / 2 off, 8 weeks on / 4 weeks off.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
+ 'Tesamorelin':{vialMg:2,bacMl:1,intro:'GHRH analog approved for visceral fat reduction.',schedule:[{weeks:'Standard',dose:1,freq:'Daily AM',label:'1mg (50u with 2mg+1mL)'}],notes:'SubQ AM fasted 30–60min before food.',warning:'2mg + 1mL BAC = 2mg/mL. High volume vs other peptides.'},
+ 'GHRP-2':{vialMg:5,bacMl:3,intro:'GH releaser — stronger than Ipamorelin but spikes cortisol/prolactin.',schedule:[{weeks:'5mg vial',dose:0.166,freq:'Daily',label:'166mcg (10u with 5mg+3mL)'},{weeks:'10mg vial',dose:0.333,freq:'Daily',label:'333mcg (10u with 10mg+3mL)'}],notes:'SubQ before bed empty stomach.',warning:'Cortisol/prolactin elevation — not for daily long-term use.'},
+ 'Epithalon':{vialMg:10,bacMl:1,intro:'Pineal peptide — telomere & sleep support.',schedule:[{weeks:'Cycle',dose:10,freq:'Every 3 days',label:'10mg full vial (100u) × 5 doses over 15 days'}],notes:'SubQ before bed. One full vial every 3 days. Repeat protocol every 4 months.',warning:'10mg + 1mL BAC = 10mg/mL. 100u = 1cc — use full insulin syringe.'},
+
+ // ——— Cognitive / Mood ———
+ 'Semax':{vialMg:10,bacMl:3,intro:'Russian nootropic peptide. Focus, memory, neuroprotection.',schedule:[{weeks:'Standard',dose:0.166,freq:'Daily AM',label:'166mcg (6u with 10mg+3mL)'}],notes:'SubQ or intranasal. Morning only. 2–4 week cycles.',warning:'10mg + 3mL BAC = 3.3mg/mL.'},
+ 'Selank':{vialMg:5,bacMl:3,intro:'Anxiolytic peptide. Calming without sedation.',schedule:[{weeks:'Standard',dose:0.1,freq:'Daily',label:'100mcg (6u with 5mg+3mL)'}],notes:'Intranasal or SubQ. AM and/or PM.',warning:'5mg + 3mL BAC = 1.7mg/mL.'},
+
+ // ——— Metabolic / Energy ———
+ 'MOTS-C':{vialMg:10,bacMl:1,intro:'Mitochondrial peptide. Metabolic & longevity benefits.',schedule:[{weeks:'Standard',dose:2.5,freq:'1x per week',label:'2.5–5mg (25–50u with 10mg+1mL)'}],notes:'SubQ once weekly.',warning:'10mg + 1mL BAC = 10mg/mL. Once weekly only.'},
+ '5-Amino-1MQ':{vialMg:5,bacMl:3,intro:'NNMT inhibitor. Metabolic & fat loss support.',schedule:[{weeks:'Standard',dose:0.167,freq:'Daily',label:'167mcg (10u with 5mg+3mL)'}],notes:'SubQ daily.',warning:'5mg + 3mL BAC = 1.7mg/mL.'},
+
+ // ——— Immune ———
+ 'Thymosin Alpha-1':{vialMg:2,bacMl:1,intro:'Immune modulator. Long-term wellness peptide.',schedule:[{weeks:'Maintenance',dose:0.4,freq:'2x per week',label:'400mcg (20u with 2mg+1mL)'},{weeks:'Higher',dose:1.5,freq:'2x per week',label:'1.5mg (75u)'}],notes:'SubQ — 2x per week, 4–6 week cycles.',warning:'2mg + 1mL BAC = 2mg/mL.'},
+ 'LL-37':{vialMg:5,bacMl:3,intro:'Antimicrobial peptide. Immune & gut support.',schedule:[{weeks:'Standard',dose:0.166,freq:'Daily',label:'166mcg (10u with 5mg+3mL)'}],notes:'SubQ — short cycles only.',warning:'5mg + 3mL BAC = 1.7mg/mL.'},
+
+ // ——— Other ———
+ 'PT-141':{vialMg:10,bacMl:2,intro:'Melanocortin agonist for libido and arousal.',schedule:[{weeks:'As needed',dose:0.5,freq:'1–2h before activity',label:'500mcg–2mg (10–40u with 10mg+2mL)'}],notes:'SubQ 1–2h before activity. Start low.',warning:'10mg + 2mL BAC = 5mg/mL. Not for daily use.'},
+ 'Melanotan II':{vialMg:10,bacMl:3,intro:'Tanning peptide. Start very low — nausea common.',schedule:[{weeks:'Starter',dose:0.166,freq:'Daily',label:'166mcg (5u with 10mg+3mL)'}],notes:'SubQ. Start 0.5mg, titrate slowly. Sun exposure enhances effect.',warning:'10mg + 3mL BAC = 3.3mg/mL.'},
 };
 
+// Quick-fill suggestions (BioVantix doses)
 const PEP_PROTOCOLS={
- 'BPC-157':{dose:'500mcg',freq:'Daily',notes:'SubQ near injury or abdomen. 4-8 week cycle.'},
- 'TB-500':{dose:'4mg',freq:'3x per week',notes:'SubQ or IM. 1mL BAC water. 40 units on U-100 syringe.'},
- 'GHK-Cu':{dose:'1mg',freq:'Daily before bed',notes:'Abdomen SubQ. 50mg vial + 2mL BAC = 25mg/mL. 30 days on/30 days off cycle.'},
+ // GLP-1 / Weight
+ 'Tirzepatide':{dose:'2.5mg',freq:'Weekly',notes:'SubQ weekly. 10mg vial + 2mL BAC. Start at 2.5mg, max 5mg/wk.'},
+ 'Retatrutide':{dose:'2mg',freq:'Weekly',notes:'SubQ weekly. 10mg vial + 2mL BAC. Max 4mg/wk.'},
+ 'Mazdutide':{dose:'2mg',freq:'Weekly',notes:'SubQ weekly. 10mg vial + 2mL BAC. Max 4mg/wk.'},
+ 'Cagrilintide':{dose:'250mcg',freq:'Weekly',notes:'SubQ weekly. 10mg + 2mL BAC. Escalate by 0.5–1mg/wk to max 4.5mg.'},
+ 'Semaglutide':{dose:'0.25mg',freq:'Weekly',notes:'SubQ weekly. 10mg + 2mL BAC. Titrate to 2.4mg max.'},
+ // Recovery
+ 'BPC-157':{dose:'300mcg',freq:'Daily',notes:'SubQ near injury or abdomen. 5mg vial + 2.5mL BAC. 5 on / 2 off, 4–6wk.'},
+ 'TB-500':{dose:'200mcg',freq:'Daily',notes:'SubQ or IM. 5mg vial + 2.5mL BAC. 5 on / 2 off.'},
+ 'GHK-Cu':{dose:'835mcg',freq:'Daily',notes:'SubQ abdomen. 50mg vial + 3mL BAC = 16.7mg/mL.'},
+ 'IGF-1 LR3':{dose:'40mcg',freq:'Daily',notes:'SubQ. 1mg vial + 2.5mL BAC. 5 on / 2 off, 2.5–5 weeks.'},
+ 'AOD9604':{dose:'300mcg',freq:'Daily AM',notes:'SubQ AM fasted. 2mg vial + 2mL BAC. 6 weeks on/off.'},
+ // GH / Anti-aging
+ 'Ipamorelin':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5mg + 2.5mL BAC.'},
+ 'CJC-1295 (no DAC)':{dose:'100mcg',freq:'Daily',notes:'SubQ before bed. 5mg + 2.5mL BAC. Stack with Ipamorelin.'},
+ 'Ipamorelin / CJC blend':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5 on / 2 off.'},
+ 'CJC-1295 DAC':{dose:'100mcg',freq:'2x per week',notes:'SubQ. 2mg vial + 2mL BAC. NEVER daily — desensitization risk.'},
+ 'Sermorelin':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5mg + 2.5mL BAC.'},
+ 'Tesamorelin':{dose:'1mg',freq:'Daily AM',notes:'AM fasted 30–60min before food. 2mg vial + 1mL BAC.'},
+ 'GHRP-2':{dose:'166mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5mg + 3mL BAC.'},
+ 'Epithalon':{dose:'10mg',freq:'Every 3 days x15 days',notes:'Before bed. 10mg vial + 1mL BAC. Full vial each dose.'},
+ // Cognitive
+ 'Semax':{dose:'166mcg',freq:'Daily AM',notes:'SubQ or intranasal. Morning only. 10mg + 3mL BAC.'},
+ 'Selank':{dose:'100mcg',freq:'Daily',notes:'Intranasal or SubQ. 5mg + 3mL BAC.'},
+ // Metabolic
+ 'MOTS-C':{dose:'2.5mg',freq:'Weekly',notes:'SubQ once weekly. 10mg vial + 1mL BAC.'},
+ '5-Amino-1MQ':{dose:'167mcg',freq:'Daily',notes:'SubQ daily. 5mg + 3mL BAC.'},
+ // Immune
+ 'Thymosin Alpha-1':{dose:'400mcg',freq:'2x per week',notes:'SubQ. 2mg vial + 1mL BAC. 4–6 week cycles.'},
+ 'LL-37':{dose:'166mcg',freq:'Daily',notes:'SubQ — short cycles only. 5mg + 3mL BAC.'},
+ // Other
+ 'PT-141':{dose:'500mcg',freq:'As needed',notes:'1–2h before activity. 10mg vial + 2mL BAC. Not daily.'},
+ 'Melanotan II':{dose:'166mcg',freq:'Daily — start low',notes:'SubQ. 10mg + 3mL BAC. Sun exposure enhances effect.'},
+ // Blends (kept as-is for product compatibility)
  'Glow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
  'Klow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
- 'Ipamorelin':{dose:'300mcg',freq:'5x/week',notes:'AM or PM empty stomach. 3mL BAC water. 8wk on/off.'},
- 'CJC-1295 (no DAC)':{dose:'100mcg',freq:'Daily before bed',notes:'Empty stomach 2h before bed. Stack with Ipamorelin.'},
- 'Ipamorelin / CJC blend':{dose:'300mcg',freq:'5x/week',notes:'Before bed empty stomach. 3mL BAC water. 8wk on/off.'},
- 'MOTS-C':{dose:'1mg',freq:'5x/week AM',notes:'SubQ AM. 2mL BAC water. 8 weeks on/off.'},
- 'Semax':{dose:'300mcg',freq:'Daily AM',notes:'SubQ or intranasal. Morning only. 2-4 week cycles.'},
- 'Selank':{dose:'500mcg',freq:'Daily',notes:'Intranasal or SubQ. AM and/or PM. Mild — no sedation.'},
- 'Tesamorelin':{dose:'2mg',freq:'5x/week AM',notes:'AM fasted 30-60min before food. 2mL BAC water.'},
- 'Semaglutide':{dose:'0.25mg',freq:'Weekly',notes:'SubQ weekly — titrate up monthly. Start low.'},
- 'Tirzepatide':{dose:'2.5mg',freq:'Weekly',notes:'SubQ weekly — titrate every 4 weeks. Start at 2.5mg.'},
- 'Retatrutide':{dose:'2mg',freq:'Weekly',notes:'SubQ weekly — titrate monthly. 2mL BAC water.'},
- 'Epithalon':{dose:'5mg',freq:'10 nights then 4mo off',notes:'Before bed. 1mL BAC water. 10 consecutive nights only.'},
- 'SS-31':{dose:'4mg',freq:'Daily',notes:'SubQ daily. Consider 5mL BAC water for easier dosing.'},
- 'NAD+':{dose:'500mg',freq:'Weekly',notes:'IV push or SubQ. Full vial = one dose per week.'},
- 'KPV':{dose:'500mcg',freq:'Daily',notes:'SubQ or oral. 2mL BAC water. Stack with BPC-157.'},
- 'PT-141':{dose:'1mg',freq:'As needed',notes:'1-2h before activity. Start at 1mg. Not for daily use.'},
- 'AOD9604':{dose:'300mcg',freq:'5x/week AM',notes:'AM fasted. 2mL BAC water. 8 weeks on/off.'},
- 'SLU-PP-332':{dose:'10mg',freq:'Daily AM',notes:'SubQ AM. Full vial daily dose.'},
- '5-Amino-1MQ':{dose:'50mg',freq:'Daily',notes:'Oral capsule with food. NNMT inhibitor.'},
- 'Melanotan I':{dose:'1mg',freq:'Daily — start low',notes:'SubQ. Start 0.5mg, titrate slowly. Sun exposure enhances effect.'},
- 'Oxytocin':{dose:'20iu',freq:'As needed',notes:'Intranasal. Social recovery or bonding context.'},
- 'Thymosin Alpha-1':{dose:'1.5mg',freq:'2x per week',notes:'SubQ. Immune support. 4-6 week cycles.'},
- 'HGH':{dose:'2iu',freq:'Daily AM fasted',notes:'SubQ. Conservative wellness dose. 3-month cycles.'},
- 'Glutathione':{dose:'600mg',freq:'2x per week',notes:'IV push or SubQ. Antioxidant support.'},
- 'L-Carnitine':{dose:'1200mg',freq:'Daily',notes:'SubQ or IV. Pre-workout for fat transport.'},
 };
 
 const GOALS={
- recovery:{label:'Recovery & healing',color:'#1D9E75',stack:[{name:'BPC-157',dose:'500mcg',freq:'Daily',sched:'SubQ near injury or abdomen. 4-8wk cycle.',color:'#1D9E75',units:10},{name:'TB-500',dose:'4mg',freq:'3x per week',sched:'SubQ or IM. 1mL BAC water.',color:'#1a6fc4',units:40},{name:'GHK-Cu',dose:'1mg',freq:'Daily before bed',sched:'SubQ abdomen. 50mg+2mL BAC. 30 on/30 off.',color:'#534AB7',units:4}],days:['M','T','W','T','F','S','S'],patterns:['done','done','done','today','sched','sched','off']},
- weight:{label:'Weight loss protocol',color:'#1a6fc4',stack:[{name:'Retatrutide',dose:'2mg (start)',freq:'Weekly',sched:'Titrate monthly. SubQ any time.',color:'#1D9E75',units:20},{name:'Semaglutide',dose:'0.25mg (start)',freq:'Weekly',sched:'Titrate monthly. SubQ any time.',color:'#1a6fc4',units:5},{name:'Tirzepatide',dose:'2.5mg (start)',freq:'Weekly',sched:'Titrate every 4 weeks. SubQ.',color:'#185FA5',units:33},{name:'Tesamorelin',dose:'1mg',freq:'Daily — 5 on/2 off',sched:'AM fasted 30-60min before food.',color:'#534AB7',units:20}],days:['M','T','W','T','F','S','S'],patterns:['off','off','off','today','off','off','sched']},
- performance:{label:'Performance protocol',color:'#BA7517',stack:[{name:'Ipamorelin / CJC blend',dose:'300mcg',freq:'5x/week before bed',sched:'Empty stomach 2h before bed. 3mL BAC.',color:'#BA7517',units:9},{name:'MOTS-C',dose:'1mg',freq:'5x/week AM',sched:'SubQ AM. 8 weeks on/8 weeks off.',color:'#1a6fc4',units:20},{name:'Semax',dose:'300mcg',freq:'Daily AM',sched:'SubQ or intranasal. Morning only.',color:'#534AB7',units:6}],days:['M','T','W','T','F','S','S'],patterns:['done','done','done','today','sched','sched','off']},
- longevity:{label:'Anti-aging protocol',color:'#534AB7',stack:[{name:'Epithalon',dose:'5mg',freq:'Nightly x10 nights then 4mo off',sched:'Before bed. 1mL BAC water.',color:'#534AB7',units:50},{name:'GHK-Cu',dose:'1mg',freq:'Daily before bed',sched:'SubQ abdomen. 50mg+2mL BAC. 30 on/30 off.',color:'#1D9E75',units:4},{name:'NAD+',dose:'500mg',freq:'Weekly',sched:'IV push or SubQ. Full vial per dose.',color:'#1a6fc4',units:100}],days:['M','T','W','T','F','S','S'],patterns:['done','done','off','today','sched','off','off']},
+ recovery:{label:'Recovery & healing',color:'#1D9E75',stack:[{name:'BPC-157',dose:'300mcg',freq:'Daily',sched:'SubQ near injury or abdomen. 5mg+2.5mL BAC. 5 on/2 off.',color:'#1D9E75',units:15},{name:'TB-500',dose:'200mcg',freq:'Daily',sched:'SubQ or IM. 5mg+2.5mL BAC.',color:'#1a6fc4',units:10},{name:'GHK-Cu',dose:'835mcg',freq:'Daily',sched:'SubQ abdomen. 50mg+3mL BAC = 16.7mg/mL.',color:'#534AB7',units:5}],days:['M','T','W','T','F','S','S'],patterns:['done','done','done','today','sched','sched','off']},
+ weight:{label:'Weight loss protocol',color:'#1a6fc4',stack:[{name:'Retatrutide',dose:'2mg (start)',freq:'Weekly',sched:'10mg+2mL BAC. Max 4mg/wk.',color:'#1D9E75',units:40},{name:'Tirzepatide',dose:'2.5mg (start)',freq:'Weekly',sched:'10mg+2mL BAC. Max 5mg/wk.',color:'#1a6fc4',units:50},{name:'Cagrilintide',dose:'250mcg (start)',freq:'Weekly',sched:'Stack with Tirze/Sema. 10mg+2mL BAC.',color:'#185FA5',units:5},{name:'AOD9604',dose:'300mcg',freq:'Daily AM',sched:'AM fasted. 2mg+2mL BAC. 6wk on/off.',color:'#534AB7',units:30}],days:['M','T','W','T','F','S','S'],patterns:['off','off','off','today','off','off','sched']},
+ performance:{label:'Performance protocol',color:'#BA7517',stack:[{name:'Ipamorelin / CJC blend',dose:'200mcg',freq:'Daily before bed',sched:'Empty stomach. 5mg+2.5mL BAC.',color:'#BA7517',units:10},{name:'MOTS-C',dose:'2.5mg',freq:'Weekly',sched:'SubQ once weekly. 10mg+1mL BAC.',color:'#1a6fc4',units:25},{name:'Semax',dose:'166mcg',freq:'Daily AM',sched:'SubQ or intranasal. Morning only.',color:'#534AB7',units:6}],days:['M','T','W','T','F','S','S'],patterns:['done','done','done','today','sched','sched','off']},
+ longevity:{label:'Anti-aging protocol',color:'#534AB7',stack:[{name:'Epithalon',dose:'10mg',freq:'Every 3 days x15 days',sched:'Before bed. 10mg+1mL BAC. Full vial.',color:'#534AB7',units:100},{name:'GHK-Cu',dose:'835mcg',freq:'Daily',sched:'SubQ abdomen. 50mg+3mL BAC.',color:'#1D9E75',units:5},{name:'Thymosin Alpha-1',dose:'400mcg',freq:'2x per week',sched:'SubQ. 2mg+1mL BAC. Immune support.',color:'#1a6fc4',units:20}],days:['M','T','W','T','F','S','S'],patterns:['done','done','off','today','sched','off','off']},
 };
 
 let activeGoal='recovery',vials=[],streak=0,todayDoses=[],checkedToday={},customStack=[],editMode=false;
@@ -769,6 +867,11 @@ function av_autofillDose(){
   if(hint)hint.textContent='✓ from '+source;
  } else if(hint){
   hint.textContent='';
+ }
+ // 3) Suggest BAC water from titration protocol if available
+ const bacInp=document.getElementById('av-bac');
+ if(bacInp && TITRATION_PROTOCOLS[pepKey] && TITRATION_PROTOCOLS[pepKey].bacMl){
+  bacInp.value=TITRATION_PROTOCOLS[pepKey].bacMl;
  }
 }
 
