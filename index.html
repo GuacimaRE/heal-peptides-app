@@ -457,7 +457,7 @@ select option{background:#1a1a28}
  <button class="close-btn" onclick="hideModal()">×</button>
  <h3>Add new vial</h3>
  <span class="lbl">Peptide</span>
- <select id="av-name" onchange="av_recalc()">
+ <select id="av-name" onchange="av_onPeptideChange()">
  <option value="BPC-157|10">BPC-157 10mg</option><option value="TB-500|10">TB-500 10mg</option><option value="GHK-Cu|50">GHK-Cu 50mg</option>
  <option value="Glow Blend|70">Glow Blend 70mg</option><option value="Klow Blend|80">Klow Blend 80mg</option><option value="Ipamorelin/CJC|10">Ipamorelin/CJC 10mg</option>
  <option value="MOTS-C|10">MOTS-C 10mg</option><option value="Tesamorelin|10">Tesamorelin 10mg</option><option value="Semaglutide|10">Semaglutide 10mg</option>
@@ -469,7 +469,7 @@ select option{background:#1a1a28}
 
  <div class="row2" style="margin-top:10px">
   <div>
-   <span class="lbl" style="margin-top:0">Your dose</span>
+   <span class="lbl" style="margin-top:0">Your dose <span id="av-dose-hint" style="color:#5DCAA5;font-size:9px;font-weight:500;margin-left:4px"></span></span>
    <input type="text" id="av-dose" value="500mcg" placeholder="e.g. 500mcg or 2.5mg" oninput="av_recalc()" style="margin-bottom:0">
   </div>
   <div>
@@ -736,7 +736,43 @@ function renderTracker(){
 }
 
 function logDose(i){if(vials[i].used<vials[i].total){vials[i].used++;save();renderTracker();showToast('Dose logged for '+vials[i].name.split(' ')[0]);}else{showToast('Vial empty — time to reorder!');}}
-function showAddVial(){document.getElementById('add-modal').classList.add('show');setTimeout(av_recalc,50);}
+function showAddVial(){document.getElementById('add-modal').classList.add('show');setTimeout(()=>{av_autofillDose();av_recalc();},50);}
+
+// Autofill the dose field based on (1) active protocol, (2) PEP_PROTOCOLS suggestion
+function av_autofillDose(){
+ const sel=document.getElementById('av-name');
+ const doseInp=document.getElementById('av-dose');
+ const hint=document.getElementById('av-dose-hint');
+ if(!sel||!doseInp)return;
+ const [pepKey]=sel.value.split('|');
+ // 1) Try active protocol (todayDoses or customStack)
+ let source='';
+ let dose='';
+ const fromToday=(todayDoses||[]).find(d=>d.name&&pepKey&&d.name.toLowerCase().includes(pepKey.toLowerCase().split(' ')[0]));
+ if(fromToday){
+  // detail looks like "500mcg · Daily" — extract the dose part
+  const m=String(fromToday.detail||'').match(/[\d\.]+\s*(mcg|mg|iu|ml)/i);
+  if(m){dose=m[0];source='your active protocol';}
+ }
+ if(!dose){
+  const fromCustom=(customStack||[]).find(p=>p.name&&pepKey&&p.name.toLowerCase().includes(pepKey.toLowerCase().split(' ')[0]));
+  if(fromCustom&&fromCustom.dose){dose=fromCustom.dose;source='your custom protocol';}
+ }
+ // 2) Fall back to PEP_PROTOCOLS suggestion
+ if(!dose && PEP_PROTOCOLS[pepKey]){
+  dose=PEP_PROTOCOLS[pepKey].dose;
+  source='suggested research dose';
+ }
+ if(dose){
+  doseInp.value=dose;
+  if(hint)hint.textContent='✓ from '+source;
+ } else if(hint){
+  hint.textContent='';
+ }
+}
+
+// Wrap select onchange to autofill before recalc
+function av_onPeptideChange(){av_autofillDose();av_recalc();}
 
 function av_parseDose(str){
  // returns dose in mg
