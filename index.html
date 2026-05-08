@@ -7,7 +7,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Heal Peptides">
 <meta name="theme-color" content="#080810">
-<title>Heal Peptides App</title>
+<title>HEAL Peptides — Precision Research</title>
+<meta name="description" content="Mobile-first peptide protocol tracker. Reconstitution calculator, dose schedule, vial inventory. Research use only.">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -172,7 +177,7 @@ select option{background:#1a1a28}
    <div class="auth-field"><label>Confirm password</label><input type="password" id="r-pass2" placeholder="Repeat password" autocomplete="new-password"></div>
    <button class="auth-btn" onclick="doRegister()">Create account →</button>
   </div>
-  <div class="auth-disc">For research purposes only · healpeptides.net</div>
+  <div class="auth-disc">For research purposes only · healpeptides.net<br><a href="/terms.html" style="color:#3aa0ff;text-decoration:none">Terms</a> · <a href="/privacy.html" style="color:#3aa0ff;text-decoration:none">Privacy</a></div>
  </div>
 </div>
 
@@ -334,6 +339,7 @@ select option{background:#1a1a28}
  <div class="card"><div class="ct">Recommended stack</div><div id="stack-list"></div></div>
  <div class="card"><div class="ct">Weekly schedule</div><div id="proto-sched"></div></div>
  <button class="btn" onclick="activateQuickProtocol()">✓ Activate this protocol</button>
+ <button class="btn-sm" onclick="shareQuickProtocol()" style="width:100%;margin-top:8px;background:#1D9E75">📄 Share this protocol</button>
  </div>
  <div class="mode-section" id="mode-custom">
  <div class="add-pep-box">
@@ -372,6 +378,7 @@ select option{background:#1a1a28}
  <div id="custom-stack-list"><div class="empty-stack">No peptides added yet.<br>Use the form above to build your stack.</div></div>
  </div>
  <button class="btn" onclick="activateCustomProtocol()" id="activate-custom" style="opacity:.4">✓ Activate custom protocol</button>
+ <button class="btn-sm" onclick="shareCustomProtocol()" style="width:100%;margin-top:8px;background:#1D9E75">📄 Share my protocol</button>
  </div>
  <div class="disc">Research use only. Dosages are general research ranges. Consult a healthcare professional.</div>
 </div>
@@ -1077,6 +1084,93 @@ showApp=async function(user){
    renderHome();renderProto();renderCustomStack();renderTracker();
   }
  }
+};
+
+// ============================================
+// V3 ADDITIONS: PWA, Share Protocol, Receive Shared
+// ============================================
+
+// --- Register Service Worker ---
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>{
+  navigator.serviceWorker.register('/sw.js').catch(err=>console.warn('SW registration failed:',err));
+ });
+}
+
+// --- Share Protocol ---
+function encodeProtocolToUrl(stack,goal){
+ const payload={s:stack.map(p=>({n:p.name,d:p.dose||p.detail||'',f:p.freq||'',t:p.notes||p.sched||''})),g:goal||''};
+ const json=JSON.stringify(payload);
+ // base64url encode
+ const b64=btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ return location.origin+'/?p='+b64;
+}
+
+function decodeProtocolFromUrl(){
+ const params=new URLSearchParams(location.search);
+ const p=params.get('p');
+ if(!p)return null;
+ try{
+  const b64=p.replace(/-/g,'+').replace(/_/g,'/');
+  const json=decodeURIComponent(escape(atob(b64)));
+  return JSON.parse(json);
+ }catch(e){return null;}
+}
+
+function shareQuickProtocol(){
+ const g=GOALS[activeGoal];
+ if(!g){showToast('Pick a goal first');return;}
+ const url=encodeProtocolToUrl(g.stack,activeGoal);
+ shareUrl(url,g.label||'My protocol');
+}
+
+function shareCustomProtocol(){
+ if(!customStack.length){showToast('Add at least one peptide first');return;}
+ const url=encodeProtocolToUrl(customStack,'custom');
+ shareUrl(url,'My custom protocol');
+}
+
+function shareUrl(url,title){
+ const text='💊 '+title+' — from HEAL Peptides\n\n'+url;
+ if(navigator.share){
+  navigator.share({title:'HEAL Peptides Protocol',text:title,url:url}).catch(()=>fallbackShare(url,text));
+ } else {
+  fallbackShare(url,text);
+ }
+}
+
+function fallbackShare(url,text){
+ // Show modal with copy button + WhatsApp
+ const wa='https://wa.me/?text='+encodeURIComponent(text);
+ const html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px" onclick="this.remove()"><div style="background:#0f0f1a;border-radius:16px;padding:20px;max-width:360px;width:100%;border:0.5px solid rgba(255,255,255,.1)" onclick="event.stopPropagation()"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">📄 Share your protocol</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:12px">Anyone with this link can preview your protocol in HEAL Peptides.</div><input type="text" readonly value="${url}" id="share-url-input" onclick="this.select()" style="width:100%;background:#1a1a28;border:0.5px solid rgba(255,255,255,.1);border-radius:9px;color:#3aa0ff;padding:9px 12px;font-size:11px;font-family:monospace;margin-bottom:10px"/><button onclick="navigator.clipboard.writeText(document.getElementById('share-url-input').value);this.textContent='✓ Copied'" style="width:100%;background:#1a6fc4;color:#fff;border:none;border-radius:9px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px">Copy link</button><a href="${wa}" target="_blank" style="display:block;background:#25d366;color:#fff;border-radius:9px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none">Send via WhatsApp</a><button onclick="this.parentElement.parentElement.remove()" style="width:100%;background:none;color:rgba(255,255,255,.4);border:none;padding:10px;font-size:12px;cursor:pointer;margin-top:6px;font-family:'Inter',sans-serif">Close</button></div></div>`;
+ const div=document.createElement('div');div.innerHTML=html;document.body.appendChild(div.firstChild);
+}
+
+// --- Receive shared protocol from URL ---
+function handleSharedProtocol(){
+ const data=decodeProtocolFromUrl();
+ if(!data||!data.s||!data.s.length)return;
+ // Show modal asking if they want to import
+ const stack=data.s;
+ const list=stack.map(p=>'• <b style="color:#fff">'+p.n+'</b> — '+p.d+(p.f?' · '+p.f:'')).join('<br>');
+ const html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:99999;padding:24px"><div style="background:#0f0f1a;border-radius:16px;padding:24px;max-width:380px;width:100%;border:0.5px solid #1a4a80"><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px">📄 Shared protocol</div><div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:14px">Someone shared this protocol with you. Import it to your account?</div><div style="background:#0a1628;border:0.5px solid rgba(26,111,196,.3);border-radius:10px;padding:12px;font-size:12px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:14px">${list}</div><button onclick="window._importShared()" style="width:100%;background:#1a6fc4;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px">✓ Import to my protocol</button><button onclick="document.getElementById('shared-modal').remove();history.replaceState(null,'',location.pathname)" style="width:100%;background:none;color:rgba(255,255,255,.4);border:0.5px solid rgba(255,255,255,.1);border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif">Skip</button></div></div>`;
+ const div=document.createElement('div');div.id='shared-modal';div.innerHTML=html;document.body.appendChild(div);
+ window._importShared=function(){
+  // Add to custom stack
+  stack.forEach(p=>{customStack.push({name:p.n,dose:p.d,freq:p.f||'Daily',notes:p.t||''});});
+  save();
+  if(typeof renderCustomStack==='function')renderCustomStack();
+  document.getElementById('shared-modal').remove();
+  history.replaceState(null,'',location.pathname);
+  showToast('Protocol imported! Go to Protocol tab → Custom to activate.');
+ };
+}
+
+// Run on load (after auth)
+const _origShowAppV3=showApp;
+showApp=async function(user){
+ await _origShowAppV3(user);
+ setTimeout(handleSharedProtocol,500);
 };
 
 load();calcFromMcg();renderHome();renderProto();renderCustomStack();renderTracker();
