@@ -528,11 +528,11 @@ select option{background:#1a1a28}
  <div class="row2" style="margin-top:10px">
   <div>
    <span class="lbl" style="margin-top:0">Your dose <span id="av-dose-hint" style="color:#5DCAA5;font-size:9px;font-weight:500;margin-left:4px"></span></span>
-   <input type="text" id="av-dose" value="500mcg" placeholder="e.g. 500mcg or 2.5mg" oninput="av_recalc()" style="margin-bottom:0">
+   <input type="text" id="av-dose" placeholder="Pick peptide above first" oninput="av_recalc()" style="margin-bottom:0">
   </div>
   <div>
    <span class="lbl" style="margin-top:0">BAC water (mL)</span>
-   <input type="number" id="av-bac" value="2" step="0.5" min="0.5" max="10" oninput="av_recalc()" style="margin-bottom:0">
+   <input type="number" id="av-bac" placeholder="Auto" step="0.5" min="0.5" max="10" oninput="av_recalc()" style="margin-bottom:0">
   </div>
  </div>
 
@@ -840,12 +840,30 @@ function renderTracker(){
  const barColor=pct>40?'#1D9E75':pct>15?'#BA7517':'#E24B4A';
  const badge=pct>40?'<span class="pill pill-ok">OK</span>':pct>15?'<span class="pill pill-warn">Low</span>':'<span class="pill pill-low">Order now</span>';
  const unitsTag=v.units?`<span style="display:inline-block;background:rgba(26,111,196,.2);border:0.5px solid rgba(26,111,196,.5);border-radius:6px;padding:1px 7px;font-size:10px;font-weight:600;color:#3aa0ff;margin-left:6px">${v.units}u/dose</span>`:'';
- return `<div class="vrow"><div class="vic">${v.name.slice(0,2).toUpperCase()}</div><div class="vi"><div class="vn">${v.name}${unitsTag}${badge}</div><div class="vd">${left} of ${v.total} doses remaining</div><div class="pb"><div class="pf" style="width:${pct}%;background:${barColor}"></div></div></div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0"><button class="rbtn" onclick="logDose(${i})">Use</button>${pct<=20?`<button class="rbtn" onclick="window.open('https://healpeptides.net','_blank')">Order</button>`:''}</div></div>`;
+ return `<div class="vrow"><div class="vic">${v.name.slice(0,2).toUpperCase()}</div><div class="vi"><div class="vn">${v.name}${unitsTag}${badge}<button onclick="deleteVial(${i})" style="background:none;border:none;color:rgba(255,255,255,.25);font-size:14px;cursor:pointer;padding:2px 6px;margin-left:4px;line-height:1" title="Delete vial">×</button></div><div class="vd">${left} of ${v.total} doses remaining</div><div class="pb"><div class="pf" style="width:${pct}%;background:${barColor}"></div></div></div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0"><button class="rbtn" onclick="logDose(${i})">Use</button>${pct<=20?`<button class="rbtn" onclick="window.open('https://healpeptides.net','_blank')">Order</button>`:''}</div></div>`;
  }).join('');
 }
 
 function logDose(i){if(vials[i].used<vials[i].total){vials[i].used++;save();renderTracker();showToast('Dose logged for '+vials[i].name.split(' ')[0]);}else{showToast('Vial empty — time to reorder!');}}
-function showAddVial(){document.getElementById('add-modal').classList.add('show');setTimeout(()=>{av_autofillDose();av_recalc();},50);}
+
+function deleteVial(i){
+ if(!vials[i])return;
+ const name=vials[i].name;
+ if(confirm('Delete '+name+'? This cannot be undone.')){
+  vials.splice(i,1);
+  save();renderTracker();
+  showToast('Deleted: '+name);
+ }
+}
+
+function showAddVial(){
+ document.getElementById('add-modal').classList.add('show');
+ // Clear any leftover values to force fresh state
+ document.getElementById('av-dose').value='';
+ document.getElementById('av-bac').value='';
+ document.getElementById('av-doses').value='';
+ setTimeout(()=>{av_autofillDose();av_recalc();},50);
+}
 
 // Autofill the dose field based on (1) active protocol, (2) PEP_PROTOCOLS suggestion
 function av_autofillDose(){
