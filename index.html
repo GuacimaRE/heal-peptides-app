@@ -457,18 +457,39 @@ select option{background:#1a1a28}
  <button class="close-btn" onclick="hideModal()">×</button>
  <h3>Add new vial</h3>
  <span class="lbl">Peptide</span>
- <select id="av-name">
- <option>BPC-157 10mg</option><option>TB-500 10mg</option><option>GHK-Cu 50mg</option>
- <option>Glow Blend 70mg</option><option>Klow Blend 80mg</option><option>Ipamorelin/CJC 10mg</option>
- <option>MOTS-C 10mg</option><option>Tesamorelin 10mg</option><option>Semaglutide 10mg</option>
- <option>Tirzepatide 15mg</option><option>Retatrutide 20mg</option><option>Epithalon 10mg</option>
- <option>SS-31 10mg</option><option>NAD+ 500mg</option><option>Selank 10mg</option>
- <option>Semax 10mg</option><option>KPV 10mg</option><option>PT-141 10mg</option>
- <option>AOD9604 10mg</option><option>SLU-PP-332 10mg</option><option>5-Amino-1MQ 10mg</option>
+ <select id="av-name" onchange="av_recalc()">
+ <option value="BPC-157|10">BPC-157 10mg</option><option value="TB-500|10">TB-500 10mg</option><option value="GHK-Cu|50">GHK-Cu 50mg</option>
+ <option value="Glow Blend|70">Glow Blend 70mg</option><option value="Klow Blend|80">Klow Blend 80mg</option><option value="Ipamorelin/CJC|10">Ipamorelin/CJC 10mg</option>
+ <option value="MOTS-C|10">MOTS-C 10mg</option><option value="Tesamorelin|10">Tesamorelin 10mg</option><option value="Semaglutide|10">Semaglutide 10mg</option>
+ <option value="Tirzepatide|15">Tirzepatide 15mg</option><option value="Retatrutide|20">Retatrutide 20mg</option><option value="Epithalon|10">Epithalon 10mg</option>
+ <option value="SS-31|10">SS-31 10mg</option><option value="NAD+|500">NAD+ 500mg</option><option value="Selank|10">Selank 10mg</option>
+ <option value="Semax|10">Semax 10mg</option><option value="KPV|10">KPV 10mg</option><option value="PT-141|10">PT-141 10mg</option>
+ <option value="AOD9604|10">AOD9604 10mg</option><option value="SLU-PP-332|10">SLU-PP-332 10mg</option><option value="5-Amino-1MQ|10">5-Amino-1MQ 10mg</option>
  </select>
- <span class="lbl" style="margin-top:10px">Total doses in vial</span>
- <input type="number" id="av-doses" value="40" min="1" max="300" style="margin-top:4px;margin-bottom:16px">
- <button class="btn" onclick="addVial()">Add vial</button>
+
+ <div class="row2" style="margin-top:10px">
+  <div>
+   <span class="lbl" style="margin-top:0">Your dose</span>
+   <input type="text" id="av-dose" value="500mcg" placeholder="e.g. 500mcg or 2.5mg" oninput="av_recalc()" style="margin-bottom:0">
+  </div>
+  <div>
+   <span class="lbl" style="margin-top:0">BAC water (mL)</span>
+   <input type="number" id="av-bac" value="2" step="0.5" min="0.5" max="10" oninput="av_recalc()" style="margin-bottom:0">
+  </div>
+ </div>
+
+ <div id="av-calc-result" style="background:#0a1628;border:0.5px solid rgba(26,111,196,.3);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.7">
+  <div style="display:flex;justify-content:space-between"><span>Doses per vial</span><b id="av-doses-calc" style="color:#3aa0ff;font-size:14px">—</b></div>
+  <div style="display:flex;justify-content:space-between"><span>Syringe units / dose</span><b id="av-units-calc" style="color:#5DCAA5">—</b></div>
+  <div style="display:flex;justify-content:space-between"><span>Volume / dose</span><b id="av-vol-calc" style="color:rgba(255,255,255,.6)">—</b></div>
+ </div>
+
+ <details style="margin-top:8px">
+  <summary style="font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;padding:4px 0">Override total doses (advanced)</summary>
+  <input type="number" id="av-doses" placeholder="Auto from calc" min="1" max="300" style="margin-top:6px;margin-bottom:0">
+ </details>
+
+ <button class="btn" onclick="addVial()" style="margin-top:14px">Add vial</button>
 </div>
 </div>
 
@@ -709,14 +730,63 @@ function renderTracker(){
  const pct=Math.round((1-v.used/v.total)*100),left=v.total-v.used;
  const barColor=pct>40?'#1D9E75':pct>15?'#BA7517':'#E24B4A';
  const badge=pct>40?'<span class="pill pill-ok">OK</span>':pct>15?'<span class="pill pill-warn">Low</span>':'<span class="pill pill-low">Order now</span>';
- return `<div class="vrow"><div class="vic">${v.name.slice(0,2).toUpperCase()}</div><div class="vi"><div class="vn">${v.name}${badge}</div><div class="vd">${left} of ${v.total} doses remaining</div><div class="pb"><div class="pf" style="width:${pct}%;background:${barColor}"></div></div></div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0"><button class="rbtn" onclick="logDose(${i})">Use</button>${pct<=20?`<button class="rbtn" onclick="window.open('https://healpeptides.net','_blank')">Order</button>`:''}</div></div>`;
+ const unitsTag=v.units?`<span style="display:inline-block;background:rgba(26,111,196,.2);border:0.5px solid rgba(26,111,196,.5);border-radius:6px;padding:1px 7px;font-size:10px;font-weight:600;color:#3aa0ff;margin-left:6px">${v.units}u/dose</span>`:'';
+ return `<div class="vrow"><div class="vic">${v.name.slice(0,2).toUpperCase()}</div><div class="vi"><div class="vn">${v.name}${unitsTag}${badge}</div><div class="vd">${left} of ${v.total} doses remaining</div><div class="pb"><div class="pf" style="width:${pct}%;background:${barColor}"></div></div></div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0"><button class="rbtn" onclick="logDose(${i})">Use</button>${pct<=20?`<button class="rbtn" onclick="window.open('https://healpeptides.net','_blank')">Order</button>`:''}</div></div>`;
  }).join('');
 }
 
 function logDose(i){if(vials[i].used<vials[i].total){vials[i].used++;save();renderTracker();showToast('Dose logged for '+vials[i].name.split(' ')[0]);}else{showToast('Vial empty — time to reorder!');}}
-function showAddVial(){document.getElementById('add-modal').classList.add('show');}
+function showAddVial(){document.getElementById('add-modal').classList.add('show');setTimeout(av_recalc,50);}
+
+function av_parseDose(str){
+ // returns dose in mg
+ const s=String(str||'').trim();
+ const mcg=s.match(/(\d+\.?\d*)\s*mcg/i);
+ if(mcg)return parseFloat(mcg[1])/1000;
+ const mg=s.match(/(\d+\.?\d*)\s*mg/i);
+ if(mg)return parseFloat(mg[1]);
+ // bare number = assume mcg
+ const n=parseFloat(s);
+ return isNaN(n)?0:n/1000;
+}
+
+function av_recalc(){
+ const sel=document.getElementById('av-name');
+ if(!sel)return;
+ const [name,vialMgStr]=sel.value.split('|');
+ const vialMg=parseFloat(vialMgStr)||10;
+ const doseMg=av_parseDose(document.getElementById('av-dose').value);
+ const bacMl=parseFloat(document.getElementById('av-bac').value)||2;
+ const doseEl=document.getElementById('av-doses-calc');
+ const unitsEl=document.getElementById('av-units-calc');
+ const volEl=document.getElementById('av-vol-calc');
+ if(!doseMg||!vialMg||!bacMl){
+  doseEl.textContent='—';unitsEl.textContent='—';volEl.textContent='—';return;
+ }
+ const doses=Math.floor(vialMg/doseMg);
+ const concMgPerMl=vialMg/bacMl;
+ const volMl=doseMg/concMgPerMl;
+ const units=Math.round(volMl*100);
+ doseEl.textContent=doses+' doses';
+ unitsEl.textContent=units+' units';
+ volEl.textContent=volMl.toFixed(3)+' mL';
+}
 function hideModal(){document.getElementById('add-modal').classList.remove('show');}
-function addVial(){const name=document.getElementById('av-name').value,total=parseInt(document.getElementById('av-doses').value)||40;vials.push({name,total,used:0,added:today()});save();hideModal();renderTracker();showToast('Added: '+name);}
+function addVial(){
+ const sel=document.getElementById('av-name');
+ const [pepName,vialMgStr]=sel.value.split('|');
+ const vialMg=parseFloat(vialMgStr)||10;
+ const fullName=sel.options[sel.selectedIndex].text; // e.g. "BPC-157 10mg"
+ const doseMg=av_parseDose(document.getElementById('av-dose').value);
+ const bacMl=parseFloat(document.getElementById('av-bac').value)||2;
+ const override=parseInt(document.getElementById('av-doses').value);
+ const auto=doseMg>0?Math.floor(vialMg/doseMg):40;
+ const total=override>0?override:auto;
+ const units=doseMg>0?Math.round((doseMg/(vialMg/bacMl))*100):null;
+ vials.push({name:fullName,total,used:0,added:today(),doseMg,bacMl,units});
+ save();hideModal();renderTracker();
+ showToast('Added: '+fullName+' — '+total+' doses');
+}
 
 function renderCalcResults(mg,bac,doseMcg,units){
  const totalMcg=mg*1000,concPerMl=totalMcg/bac,volMl=doseMcg/concPerMl;
