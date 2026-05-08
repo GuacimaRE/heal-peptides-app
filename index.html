@@ -229,7 +229,7 @@ select option{background:#1a1a28}
  <optgroup label="Cognitive"><option>Semax</option><option>Selank</option></optgroup>
  <optgroup label="Metabolic"><option>MOTS-C</option><option>5-Amino-1MQ</option></optgroup>
  <optgroup label="Immune"><option>Thymosin Alpha-1</option><option>LL-37</option></optgroup>
- <optgroup label="Other"><option>PT-141</option><option>Melanotan II</option></optgroup>
+ <optgroup label="Other"><option>PT-141</option><option>Melanotan II</option><option>NAD+</option><option>KPV</option><option>SLU-PP-332</option><option>MK-677</option></optgroup>
  <optgroup label="Blends"><option>Glow Blend</option><option>Klow Blend</option></optgroup>
  </select>
  <input type="text" id="home-pep-detail" placeholder="Dose & notes (e.g. 250mcg · Daily · AM)" style="width:100%;background:#1a1a28;border:0.5px solid rgba(255,255,255,.1);border-radius:9px;color:#fff;padding:8px 12px;font-size:13px;outline:none;font-family:'Inter',sans-serif;margin-bottom:8px">
@@ -371,6 +371,7 @@ select option{background:#1a1a28}
  </optgroup>
  <optgroup label="Other">
   <option>PT-141</option><option>Melanotan II</option>
+  <option>NAD+</option><option>KPV</option><option>SLU-PP-332</option><option>MK-677</option>
  </optgroup>
  <optgroup label="Blends">
   <option>Glow Blend</option><option>Klow Blend</option>
@@ -515,6 +516,10 @@ select option{background:#1a1a28}
  <optgroup label="Other">
   <option value="PT-141|10">PT-141 10mg</option>
   <option value="Melanotan II|10">Melanotan II 10mg</option>
+  <option value="NAD+|500">NAD+ 500mg</option>
+  <option value="KPV|5">KPV 5mg</option>
+  <option value="SLU-PP-332|10">SLU-PP-332 10mg</option>
+  <option value="MK-677|0">MK-677 (oral capsules)</option>
  </optgroup>
  <optgroup label="Blends">
   <option value="Glow Blend|70">Glow Blend 70mg</option>
@@ -593,6 +598,12 @@ const TITRATION_PROTOCOLS={
  // ——— Other ———
  'PT-141':{vialMg:10,bacMl:2,intro:'Melanocortin agonist for libido and arousal.',schedule:[{weeks:'As needed',dose:0.5,freq:'1–2h before activity',label:'500mcg–2mg (10–40u with 10mg+2mL)'}],notes:'SubQ 1–2h before activity. Start low.',warning:'10mg + 2mL BAC = 5mg/mL. Not for daily use.'},
  'Melanotan II':{vialMg:10,bacMl:3,intro:'Tanning peptide. Start very low — nausea common.',schedule:[{weeks:'Starter',dose:0.166,freq:'Daily',label:'166mcg (5u with 10mg+3mL)'}],notes:'SubQ. Start 0.5mg, titrate slowly. Sun exposure enhances effect.',warning:'10mg + 3mL BAC = 3.3mg/mL.'},
+
+ // ——— Add-ons (HEAL catalog) ———
+ 'NAD+':{vialMg:500,bacMl:2,intro:'Cellular energy & longevity coenzyme. Subcutaneous protocol.',schedule:[{weeks:'Standard',dose:100,freq:'2x per week',label:'100mg (40u with 500mg+2mL)'},{weeks:'Loading',dose:250,freq:'Weekly',label:'250mg (100u = full syringe)'}],notes:'SubQ slowly — some users report flushing. AM preferred.',warning:'500mg + 2mL BAC = 250mg/mL. Inject slowly to minimize flushing.'},
+ 'KPV':{vialMg:5,bacMl:2,intro:'Anti-inflammatory peptide. Often stacked with BPC-157 for gut healing.',schedule:[{weeks:'Standard',dose:0.5,freq:'Daily',label:'500mcg (20u with 5mg+2mL)'}],notes:'SubQ daily. Can also be used orally for gut issues.',warning:'5mg + 2mL BAC = 2.5mg/mL.'},
+ 'SLU-PP-332':{vialMg:10,bacMl:2,intro:'ERRβ agonist — mitochondrial &  endurance peptide.',schedule:[{weeks:'Standard',dose:10,freq:'Every other day',label:'10mg (200u = 2 syringes) every 2 days'}],notes:'SubQ. Pre-workout dosing common.',warning:'10mg + 2mL BAC = 5mg/mL. Full vial per dose.'},
+ 'MK-677':{vialMg:0,bacMl:0,oral:true,intro:'Oral GH secretagogue. Capsules only — no reconstitution.',schedule:[{weeks:'Standard',dose:25,freq:'Daily',label:'1 capsule (25mg) daily'},{weeks:'Higher',dose:50,freq:'Daily',label:'2 capsules (50mg) daily'}],notes:'Oral capsule with food. AM or PM.',warning:'Oral product — no injection needed.'},
 };
 
 // Quick-fill suggestions (BioVantix doses)
@@ -630,6 +641,11 @@ const PEP_PROTOCOLS={
  // Other
  'PT-141':{dose:'500mcg',freq:'As needed',notes:'1–2h before activity. 10mg vial + 2mL BAC. Not daily.'},
  'Melanotan II':{dose:'166mcg',freq:'Daily — start low',notes:'SubQ. 10mg + 3mL BAC. Sun exposure enhances effect.'},
+ // Add-ons
+ 'NAD+':{dose:'100mg',freq:'2x per week',notes:'SubQ slow injection. 500mg vial + 2mL BAC = 250mg/mL.'},
+ 'KPV':{dose:'500mcg',freq:'Daily',notes:'SubQ or oral. 5mg + 2mL BAC. Stack with BPC-157.'},
+ 'SLU-PP-332':{dose:'10mg',freq:'Every other day',notes:'SubQ. 10mg + 2mL BAC. Full vial per dose. Pre-workout.'},
+ 'MK-677':{dose:'25mg',freq:'Daily',notes:'Oral capsule with food. No injection.'},
  // Blends (kept as-is for product compatibility)
  'Glow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
  'Klow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
