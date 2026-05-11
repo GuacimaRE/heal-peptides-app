@@ -35,6 +35,11 @@
 .auth-err{background:rgba(226,75,74,.15);border:0.5px solid rgba(226,75,74,.4);border-radius:8px;padding:8px 12px;font-size:12px;color:#F09595;margin-bottom:12px;display:none}
 .auth-ok{background:rgba(15,110,86,.15);border:0.5px solid rgba(29,158,117,.4);border-radius:8px;padding:8px 12px;font-size:12px;color:#5DCAA5;margin-bottom:12px;display:none}
 .auth-disc{font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:16px;line-height:1.5}
+.pass-wrap{position:relative;display:flex;align-items:center;width:100%}
+.pass-wrap input{flex:1;width:auto!important;padding-right:38px}
+.eye-btn{position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:17px;color:rgba(255,255,255,.3);padding:4px;line-height:1;transition:color .15s;-webkit-tap-highlight-color:transparent}
+.eye-btn:active{color:rgba(255,255,255,.8)}
+.eye-btn.on{color:#3aa0ff}
 .user-pill{background:rgba(26,111,196,.15);border:0.5px solid rgba(26,111,196,.3);border-radius:20px;padding:4px 10px;font-size:11px;color:#3aa0ff;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px}
 .user-pill:hover{background:rgba(226,75,74,.15);border-color:rgba(226,75,74,.4);color:#F09595}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -114,7 +119,17 @@ select option{background:#1a1a28}
 .pname{font-size:13px;font-weight:600;color:#fff}
 .pdose{font-size:10px;color:rgba(255,255,255,.38);margin-top:2px}
 .pprice{font-size:14px;font-weight:700;color:#fff}
-.padd{font-size:11px;font-weight:600;color:#3aa0ff;background:rgba(26,111,196,.15);border:0.5px solid rgba(26,111,196,.35);border-radius:8px;padding:5px 12px;cursor:pointer;margin-top:4px;display:block;font-family:'Inter',sans-serif}
+.padd{font-size:11px;font-weight:600;color:#3aa0ff;background:rgba(26,111,196,.15);border:0.5px solid rgba(26,111,196,.35);border-radius:8px;padding:5px 12px;cursor:pointer;margin-top:4px;display:block;font-family:'Inter',sans-serif;transition:all .15s}
+.padd.in-cart{color:#fff;background:#1a6fc4;border-color:#1a6fc4}
+.cart-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0d1f3c;border-top:1px solid #1a4a80;padding:12px 16px 20px;z-index:200;display:none;box-shadow:0 -4px 24px rgba(0,0,0,.5)}
+.cart-bar.show{display:block}
+.cart-summary{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cart-count{font-size:13px;font-weight:600;color:#3aa0ff}
+.cart-total{font-size:16px;font-weight:700;color:#fff}
+.cart-items-list{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:10px;line-height:1.6;max-height:60px;overflow-y:auto}
+.cart-actions{display:flex;gap:8px}
+.cart-clear{flex:0 0 auto;background:rgba(226,75,74,.15);border:0.5px solid rgba(226,75,74,.4);color:#F09595;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif}
+.cart-order{flex:1;background:#25D366;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:flex-end;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:#0f0f1a;border-radius:24px 24px 0 0;padding:22px 18px 32px;width:100%;max-width:430px;border-top:0.5px solid rgba(255,255,255,.1)}
@@ -151,7 +166,7 @@ select option{background:#1a1a28}
  <div class="auth-logo"><span>HEAL</span> Peptides</div>
  <div class="auth-sub">PRECISION RESEARCH</div>
  <div class="auth-card">
-  <div class="auth-tabs">
+  <div class="auth-tabs" id="auth-tabs">
    <button class="auth-tab on" onclick="authTab('login',this)">Sign in</button>
    <button class="auth-tab" onclick="authTab('register',this)">Create account</button>
   </div>
@@ -160,7 +175,7 @@ select option{background:#1a1a28}
   <!-- LOGIN -->
   <div id="auth-login">
    <div class="auth-field"><label>Email</label><input type="email" id="l-email" placeholder="you@email.com" autocomplete="email"></div>
-   <div class="auth-field"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
+   <div class="auth-field"><label>Password</label><div class="pass-wrap"><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"><button type="button" class="eye-btn" onclick="togglePass('l-pass',this)" tabindex="-1">👁</button></div></div>
    <button class="auth-btn" onclick="doLogin()">Sign in →</button>
    <div style="text-align:center;margin-top:10px">
     <a href="#" onclick="event.preventDefault();doForgotPassword()" style="color:#3aa0ff;font-size:11px;text-decoration:none">Forgot password?</a>
@@ -173,9 +188,16 @@ select option{background:#1a1a28}
    <div class="auth-field"><label>Full name</label><input type="text" id="r-name" placeholder="Your name" autocomplete="name"></div>
    <div class="auth-field"><label>Email</label><input type="email" id="r-email" placeholder="you@email.com" autocomplete="email"></div>
    <div class="auth-field"><label>Phone (optional)</label><input type="tel" id="r-phone" placeholder="+506 8888 0000"></div>
-   <div class="auth-field"><label>Password</label><input type="password" id="r-pass" placeholder="Min 8 characters" autocomplete="new-password"></div>
-   <div class="auth-field"><label>Confirm password</label><input type="password" id="r-pass2" placeholder="Repeat password" autocomplete="new-password"></div>
+   <div class="auth-field"><label>Password</label><div class="pass-wrap"><input type="password" id="r-pass" placeholder="Min 8 characters" autocomplete="new-password"><button type="button" class="eye-btn" onclick="togglePass('r-pass',this)" tabindex="-1">👁</button></div></div>
+   <div class="auth-field"><label>Confirm password</label><div class="pass-wrap"><input type="password" id="r-pass2" placeholder="Repeat password" autocomplete="new-password"><button type="button" class="eye-btn" onclick="togglePass('r-pass2',this)" tabindex="-1">👁</button></div></div>
    <button class="auth-btn" onclick="doRegister()">Create account →</button>
+  </div>
+  <!-- RESET PASSWORD (shown when arriving from recovery email link) -->
+  <div id="auth-reset" style="display:none">
+   <div style="text-align:center;margin-bottom:16px;font-size:13px;color:rgba(255,255,255,.6)">🔐 Set your new password</div>
+   <div class="auth-field"><label>New password</label><div class="pass-wrap"><input type="password" id="reset-pass" placeholder="Min 8 characters" autocomplete="new-password"><button type="button" class="eye-btn" onclick="togglePass('reset-pass',this)" tabindex="-1">👁</button></div></div>
+   <div class="auth-field"><label>Confirm new password</label><div class="pass-wrap"><input type="password" id="reset-pass2" placeholder="Repeat password" autocomplete="new-password"><button type="button" class="eye-btn" onclick="togglePass('reset-pass2',this)" tabindex="-1">👁</button></div></div>
+   <button class="auth-btn" onclick="doSetNewPassword()">Save new password →</button>
   </div>
   <div class="auth-disc">For research purposes only · healpeptides.net<br><a href="/terms.html" style="color:#3aa0ff;text-decoration:none">Terms</a> · <a href="/privacy.html" style="color:#3aa0ff;text-decoration:none">Privacy</a></div>
  </div>
@@ -201,6 +223,8 @@ select option{background:#1a1a28}
  <button onclick="nav('hist',this)">History</button>
  <button onclick="nav('comm',this)">Community</button>
  <button onclick="nav('shop',this)">Shop</button>
+ <button onclick="nav('labs',this)">🧬 Labs</button>
+ <button id="admin-tab-btn" style="display:none" onclick="nav('admin',this)">⚙️ Admin</button>
 </div>
 
 <!-- HOME -->
@@ -258,7 +282,7 @@ select option{background:#1a1a28}
  <option value="10">BPC-157 — 10mg vial</option>
  <option value="10">TB-500 — 10mg vial</option>
  <option value="50">GHK-Cu — 50mg vial</option>
- <option value="70">Glow Blend — 70mg vial</option>
+ <option value="60">Glow Blend — 60mg vial</option>
  <option value="10">Ipamorelin — 10mg vial</option>
  <option value="10">CJC-1295 + Ipa — 10mg vial</option>
  <option value="10">MOTS-C — 10mg vial</option>
@@ -442,33 +466,205 @@ select option{background:#1a1a28}
 </div>
 
 <!-- SHOP -->
+<!-- LABS PAGE -->
+<div class="pg" id="pg-labs">
+ <div class="ttl">🧬 Blood Labs</div>
+ <div class="sub2">Upload your blood test — AI extracts & tracks your markers</div>
+
+ <!-- Upload card -->
+ <div class="card" style="background:#0a1628;border-color:#1a4a80">
+  <div class="ct">📎 Upload Blood Test</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.6">Photo or PDF from any lab. AI will extract all markers automatically.</div>
+  <label id="labs-upload-label" style="display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0f0f1a;border:1.5px dashed rgba(26,111,196,.4);border-radius:14px;padding:28px 16px;cursor:pointer;gap:8px">
+   <span style="font-size:28px">📷</span>
+   <span style="font-size:13px;font-weight:600;color:#3aa0ff">Tap to upload</span>
+   <span style="font-size:11px;color:rgba(255,255,255,.3)">JPG, PNG or PDF</span>
+   <input type="file" id="labs-file" accept="image/*,application/pdf" style="display:none" onchange="labsFileSelected(this)">
+  </label>
+  <div id="labs-preview" style="display:none;margin-top:10px;text-align:center">
+   <img id="labs-preview-img" style="max-width:100%;border-radius:10px;max-height:200px;object-fit:contain" src="" alt="preview">
+   <div id="labs-preview-name" style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px"></div>
+  </div>
+  <button class="btn" id="labs-analyze-btn" onclick="labsAnalyze()" style="margin-top:14px;display:none">Analyze with AI →</button>
+ </div>
+
+ <!-- Loading state -->
+ <div id="labs-loading" style="display:none;text-align:center;padding:24px">
+  <div style="font-size:32px;margin-bottom:12px">🤖</div>
+  <div style="font-size:14px;font-weight:600;color:#3aa0ff">Analyzing your results...</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px">This takes about 15 seconds</div>
+ </div>
+
+ <!-- Results -->
+ <div id="labs-results" style="display:none">
+  <div class="card">
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="ct" style="margin:0">📊 Latest Results</div>
+    <div id="labs-result-date" style="font-size:11px;color:rgba(255,255,255,.4)"></div>
+   </div>
+   <div id="labs-summary-box" style="background:#0a1628;border:0.5px solid #1a4a80;border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.6"></div>
+   <div id="labs-markers-list"></div>
+  </div>
+
+  <!-- History -->
+  <div class="card" id="labs-history-card" style="display:none">
+   <div class="ct">📈 History</div>
+   <div id="labs-history-list" style="font-size:12px"></div>
+  </div>
+ </div>
+
+ <!-- No results yet -->
+ <div id="labs-empty" style="text-align:center;padding:32px 16px;color:rgba(255,255,255,.3)">
+  <div style="font-size:40px;margin-bottom:12px">🧬</div>
+  <div style="font-size:14px">No labs uploaded yet</div>
+  <div style="font-size:12px;margin-top:6px">Upload your first blood test above</div>
+ </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="pg" id="pg-admin">
+ <div class="ttl">Admin Panel</div>
+ <div class="sub2" id="admin-sub">Loading...</div>
+
+ <!-- Summary cards -->
+ <div class="sg" id="admin-stats" style="grid-template-columns:repeat(3,1fr)">
+  <div class="sc"><div class="sn" id="adm-users">—</div><div class="sl">Users</div></div>
+  <div class="sc"><div class="sn" id="adm-active">—</div><div class="sl">Active vials</div></div>
+  <div class="sc"><div class="sn" id="adm-doses">—</div><div class="sl">Doses logged</div></div>
+ </div>
+
+ <!-- Users table -->
+ <div class="card">
+  <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+   <span>👥 Registered Users</span>
+   <button class="btn-sm" onclick="adminLoadUsers()">↻ Refresh</button>
+  </div>
+  <div id="admin-users-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">Loading...</div>
+ </div>
+
+ <!-- Dose activity -->
+ <div class="card">
+  <div class="ct">📊 Recent Dose Activity (last 7 days)</div>
+  <div id="admin-dose-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">Loading...</div>
+ </div>
+
+ <!-- Stories manager -->
+ <div class="card">
+  <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+   <span>💬 Stories</span>
+   <button class="btn-sm" onclick="adminLoadStories()">↻ Refresh</button>
+  </div>
+  <div id="admin-stories-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">Loading...</div>
+  <!-- Add story form -->
+  <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid rgba(255,255,255,.08)">
+   <div class="ct" style="font-size:12px;margin-bottom:8px">+ Add new story</div>
+   <div class="lbl">Author name</div><input id="adm-s-author" placeholder="Marco T." style="margin-bottom:6px">
+   <div class="lbl">Location</div><input id="adm-s-location" placeholder="San José, CR" style="margin-bottom:6px">
+   <div class="lbl">Peptide used</div><input id="adm-s-peptide" placeholder="BPC-157 + TB-500" style="margin-bottom:6px">
+   <div class="lbl">Duration</div><input id="adm-s-duration" placeholder="8 weeks" style="margin-bottom:6px">
+   <div class="lbl">Testimonial text</div><textarea id="adm-s-text" rows="3" style="width:100%;background:#1a1a28;border:0.5px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;padding:9px 12px;font-size:13px;outline:none;font-family:Inter,sans-serif;resize:vertical;margin-bottom:6px"></textarea>
+   <div class="lbl">Publish immediately?</div>
+   <select id="adm-s-pub" style="margin-bottom:10px"><option value="true">Yes — publish now</option><option value="false">No — save as draft</option></select>
+   <button class="btn" onclick="adminAddStory()">Save story</button>
+  </div>
+ </div>
+</div>
+
 <div class="pg" id="pg-shop">
  <div class="ttl">Shop</div>
  <div class="sub2">healpeptides.net · Next day delivery · Costa Rica</div>
+
+ <!-- Search -->
+ <div style="position:relative">
+  <input id="shop-search" type="text" placeholder="🔍 Search products..." oninput="filterShop(this.value)" style="width:100%;background:#0f0f1a;border:0.5px solid rgba(255,255,255,.12);border-radius:12px;color:#fff;padding:10px 14px;font-size:13px;outline:none;font-family:Inter,sans-serif">
+ </div>
+
+ <!-- CTA card -->
  <div class="card" style="background:#0a1628;border-color:#1a4a80">
- <div style="font-size:13px;font-weight:600;color:#3aa0ff;margin-bottom:6px">💬 Free protocol consultation</div>
- <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.6">Not sure what to order? WhatsApp us and we'll build your personalized protocol.</div>
- <button class="btn" style="margin-top:12px;font-size:13px" onclick="window.open('https://wa.me/50688970649','_blank')">WhatsApp us now</button>
+  <div style="font-size:13px;font-weight:600;color:#3aa0ff;margin-bottom:6px">💬 Free protocol consultation</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.6">Not sure what to order? WhatsApp us and we'll build your personalized protocol.</div>
+  <button class="btn" style="margin-top:12px;font-size:13px" onclick="window.open('https://wa.me/50688970649','_blank')">WhatsApp us now</button>
  </div>
- <div class="card">
- <div class="ct">Signature bundles</div>
- <div class="prod-row"><div><div class="pname">Glow Blend 70mg</div><div class="pdose">BPC-157 + TB-500 + GHK-Cu</div></div><div style="text-align:right"><div class="pprice">$185</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">Klow Blend 80mg</div><div class="pdose">BPC + TB500 + KPV + GHK-Cu</div></div><div style="text-align:right"><div class="pprice">$190</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">Runners Protocol</div><div class="pdose">Ipa/CJC + MOTS-C + SLU + BPC + TB</div></div><div style="text-align:right"><div class="pprice">$327</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
+
+ <!-- Signature bundles -->
+ <div class="card shop-section" data-cat="bundles">
+  <div class="ct">🌟 Signature Bundles</div>
+  <div class="prod-row"><div><div class="pname">Glow Blend 60mg</div><div class="pdose">BPC-157 + TB-500 + GHK-Cu</div></div><div style="text-align:right"><div class="pprice">$185</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Klow Blend 80mg</div><div class="pdose">BPC-157 + TB-500 + KPV + GHK-Cu</div></div><div style="text-align:right"><div class="pprice">$190</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Runners Protocol</div><div class="pdose">Ipa/CJC + MOTS-C + SLU-PP-332 + BPC + TB</div></div><div style="text-align:right"><div class="pprice">$327</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
  </div>
- <div class="card">
- <div class="ct">Best sellers</div>
- <div class="prod-row"><div><div class="pname">Retatrutide 20mg</div><div class="pdose">Triple GLP-1/GIP/Glucagon</div></div><div style="text-align:right"><div class="pprice">$220</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">Tirzepatide 15mg</div><div class="pdose">Dual GIP/GLP-1 agonist</div></div><div style="text-align:right"><div class="pprice">$75</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">Semaglutide 10mg</div><div class="pdose">GLP-1 receptor agonist</div></div><div style="text-align:right"><div class="pprice">$90</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">BPC-157 10mg</div><div class="pdose">Body Protection Compound</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">Ipamorelin/CJC 10mg</div><div class="pdose">GH pulse blend</div></div><div style="text-align:right"><div class="pprice">$80</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">MOTS-C 10mg</div><div class="pdose">Mitochondrial energy peptide</div></div><div style="text-align:right"><div class="pprice">$40</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
- <div class="prod-row"><div><div class="pname">Tesamorelin 10mg</div><div class="pdose">GHRH analogue, visceral fat</div></div><div style="text-align:right"><div class="pprice">$140</div><button class="padd" onclick="orderWA(this)">WA Order</button></div></div>
+
+ <!-- GLP-1 / Weight -->
+ <div class="card shop-section" data-cat="glp1">
+  <div class="ct">⚖️ GLP-1 / Weight Management</div>
+  <div class="prod-row"><div><div class="pname">Tirzepatide 15mg</div><div class="pdose">Dual GIP/GLP-1 agonist</div></div><div style="text-align:right"><div class="pprice">$75</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Tirzepatide 30mg</div><div class="pdose">Dual GIP/GLP-1 agonist — high dose</div></div><div style="text-align:right"><div class="pprice">$120</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Retatrutide 20mg</div><div class="pdose">Triple GLP-1/GIP/Glucagon</div></div><div style="text-align:right"><div class="pprice">$220</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Retatrutide 10mg</div><div class="pdose">Triple GLP-1/GIP/Glucagon</div></div><div style="text-align:right"><div class="pprice">$120</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Semaglutide 10mg</div><div class="pdose">GLP-1 receptor agonist</div></div><div style="text-align:right"><div class="pprice">$90</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Semaglutide 20mg</div><div class="pdose">GLP-1 receptor agonist — high dose</div></div><div style="text-align:right"><div class="pprice">$140</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">AOD9604 10mg</div><div class="pdose">Modified hGH fragment, fat metabolism</div></div><div style="text-align:right"><div class="pprice">$65</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
  </div>
- <button class="btn" onclick="window.open('https://healpeptides.net','_blank')">Browse full catalog →</button>
- <div class="disc">All products for research use only · healpeptides.net</div>
+
+ <!-- Recovery -->
+ <div class="card shop-section" data-cat="recovery">
+  <div class="ct">🧠 Recovery & Healing</div>
+  <div class="prod-row"><div><div class="pname">BPC-157 10mg</div><div class="pdose">Body Protection Compound</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">TB-500 10mg</div><div class="pdose">Thymosin Beta-4 fragment</div></div><div style="text-align:right"><div class="pprice">$95</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">GHK-Cu 50mg</div><div class="pdose">Copper peptide, collagen & repair</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">KPV 10mg</div><div class="pdose">Anti-inflammatory, gut barrier</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+ </div>
+
+ <!-- GH / Anti-aging -->
+ <div class="card shop-section" data-cat="gh">
+  <div class="ct">⚡ GH / Anti-Aging</div>
+  <div class="prod-row"><div><div class="pname">Ipamorelin/CJC-1295 10mg</div><div class="pdose">Dual GH secretagogue blend</div></div><div style="text-align:right"><div class="pprice">$80</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Ipamorelin 10mg</div><div class="pdose">Selective GH releaser</div></div><div style="text-align:right"><div class="pprice">$52</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Tesamorelin 10mg</div><div class="pdose">GHRH analogue, visceral fat</div></div><div style="text-align:right"><div class="pprice">$140</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Epithalon 10mg</div><div class="pdose">Telomere & longevity peptide</div></div><div style="text-align:right"><div class="pprice">$100</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Epithalon 20mg</div><div class="pdose">Telomere & longevity — high dose</div></div><div style="text-align:right"><div class="pprice">$175</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+ </div>
+
+ <!-- Metabolic / Longevity -->
+ <div class="card shop-section" data-cat="metabolic">
+  <div class="ct">🔥 Metabolic / Longevity</div>
+  <div class="prod-row"><div><div class="pname">MOTS-C 10mg</div><div class="pdose">Mitochondrial peptide</div></div><div style="text-align:right"><div class="pprice">$40</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">SS-31 10mg</div><div class="pdose">Mitochondrial membrane stabilizer</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">SLU-PP-332 10mg</div><div class="pdose">ERR agonist, endurance & metabolism</div></div><div style="text-align:right"><div class="pprice">$140</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">5-Amino-1MQ 10mg</div><div class="pdose">NNMT inhibitor, fat loss</div></div><div style="text-align:right"><div class="pprice">$135</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">NAD+ 500mg</div><div class="pdose">Cellular energy & DNA repair</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Glutathione 1500mg</div><div class="pdose">Master antioxidant</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">L-Carnitine 1200mg</div><div class="pdose">Fatty acid transport & energy</div></div><div style="text-align:right"><div class="pprice">$50</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+ </div>
+
+ <!-- Cognitive / Mood -->
+ <div class="card shop-section" data-cat="cognitive">
+  <div class="ct">🧠 Cognitive / Mood</div>
+  <div class="prod-row"><div><div class="pname">Semax 10mg</div><div class="pdose">Nootropic, BDNF & neuroprotection</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Selank 10mg</div><div class="pdose">Anxiolytic, GABAergic modulation</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+ </div>
+
+ <!-- Other -->
+ <div class="card shop-section" data-cat="other">
+  <div class="ct">✨ Other</div>
+  <div class="prod-row"><div><div class="pname">PT-141 10mg</div><div class="pdose">Melanocortin agonist, libido</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Bacteriostatic Water 10ml</div><div class="pdose">0.9% benzyl alcohol, sterile</div></div><div style="text-align:right"><div class="pprice">$14</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+ </div>
+
+ <div class="disc" style="text-align:center;margin-top:4px;padding-bottom:80px">All products for research use only · healpeptides.net</div>
 </div>
+
+<!-- CART BAR -->
+<div class="cart-bar" id="cart-bar">
+ <div class="cart-summary">
+  <span class="cart-count">🛒 <span id="cart-count-num">0</span> item(s) selected</span>
+  <span class="cart-total">$<span id="cart-total-num">0</span></span>
+ </div>
+ <div class="cart-items-list" id="cart-items-list"></div>
+ <div class="cart-actions">
+  <button class="cart-clear" onclick="cartClear()">Clear</button>
+  <button class="cart-order" onclick="cartOrderWA()">📲 Order via WhatsApp</button>
+ </div>
 </div>
 
 <!-- ADD VIAL MODAL -->
@@ -479,8 +675,8 @@ select option{background:#1a1a28}
  <span class="lbl">Peptide</span>
  <select id="av-name" onchange="av_onPeptideChange()">
  <optgroup label="GLP-1 / Weight">
-  <option value="Tirzepatide|10">Tirzepatide 10mg</option><option value="Tirzepatide|5">Tirzepatide 5mg</option>
-  <option value="Retatrutide|10">Retatrutide 10mg</option><option value="Retatrutide|5">Retatrutide 5mg</option>
+  <option value="Tirzepatide|15">Tirzepatide 15mg</option>
+  <option value="Retatrutide|20">Retatrutide 20mg</option><option value="Retatrutide|10">Retatrutide 10mg</option>
   <option value="Mazdutide|10">Mazdutide 10mg</option><option value="Mazdutide|5">Mazdutide 5mg</option>
   <option value="Cagrilintide|10">Cagrilintide 10mg</option><option value="Cagrilintide|5">Cagrilintide 5mg</option>
   <option value="Semaglutide|10">Semaglutide 10mg</option>
@@ -497,7 +693,7 @@ select option{background:#1a1a28}
   <option value="CJC-1295 (no DAC)|2">CJC-1295 (no DAC) 2mg</option><option value="CJC-1295 (no DAC)|5">CJC-1295 (no DAC) 5mg</option>
   <option value="CJC-1295 DAC|2">CJC-1295 DAC 2mg</option>
   <option value="Sermorelin|2">Sermorelin 2mg</option><option value="Sermorelin|5">Sermorelin 5mg</option>
-  <option value="Tesamorelin|2">Tesamorelin 2mg</option>
+  <option value="Tesamorelin|10">Tesamorelin 10mg</option>
   <option value="GHRP-2|5">GHRP-2 5mg</option><option value="GHRP-2|10">GHRP-2 10mg</option>
   <option value="Epithalon|10">Epithalon 10mg</option>
  </optgroup>
@@ -520,7 +716,7 @@ select option{background:#1a1a28}
   <option value="KPV|5">KPV 5mg</option>
  </optgroup>
  <optgroup label="Blends">
-  <option value="Glow Blend|70">Glow Blend 70mg</option>
+  <option value="Glow Blend|60">Glow Blend 60mg</option>
   <option value="Klow Blend|80">Klow Blend 80mg</option>
  </optgroup>
  </select>
@@ -532,14 +728,16 @@ select option{background:#1a1a28}
   </div>
   <div>
    <span class="lbl" style="margin-top:0">BAC water (mL)</span>
-   <input type="number" id="av-bac" placeholder="Auto" step="0.5" min="0.5" max="10" oninput="av_recalc()" style="margin-bottom:0">
+   <input type="number" id="av-bac" placeholder="Auto" step="0.5" min="0.5" max="10" oninput="av_recalc()" onchange="av_recalc()" style="margin-bottom:0">
   </div>
  </div>
 
- <div id="av-calc-result" style="background:#0a1628;border:0.5px solid rgba(26,111,196,.3);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.7">
-  <div style="display:flex;justify-content:space-between"><span>Doses per vial</span><b id="av-doses-calc" style="color:#3aa0ff;font-size:14px">—</b></div>
-  <div style="display:flex;justify-content:space-between"><span>Syringe units / dose</span><b id="av-units-calc" style="color:#5DCAA5">—</b></div>
-  <div style="display:flex;justify-content:space-between"><span>Volume / dose</span><b id="av-vol-calc" style="color:rgba(255,255,255,.6)">—</b></div>
+ <div id="av-calc-result" style="background:#0a1628;border:0.5px solid rgba(26,111,196,.3);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.8">
+  <div style="display:flex;justify-content:space-between"><span>Concentration (BAC ÷ vial)</span><b id="av-conc-calc" style="color:rgba(255,255,255,.45)">—</b></div>
+  <div style="display:flex;justify-content:space-between;border-top:0.5px solid rgba(255,255,255,.06);padding-top:6px;margin-top:4px"><span>Syringe units / dose 💉</span><b id="av-units-calc" style="color:#5DCAA5;font-size:14px">—</b></div>
+  <div style="display:flex;justify-content:space-between"><span>Volume / dose</span><b id="av-vol-calc" style="color:rgba(255,255,255,.5)">—</b></div>
+  <div style="display:flex;justify-content:space-between;border-top:0.5px solid rgba(255,255,255,.06);padding-top:6px;margin-top:4px"><span>Doses per vial</span><b id="av-doses-calc" style="color:#3aa0ff;font-size:14px">—</b></div>
+  <div id="av-note" style="font-size:10px;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.5"></div>
  </div>
 
  <details style="margin-top:8px">
@@ -559,15 +757,15 @@ select option{background:#1a1a28}
 // =========================================================
 const TITRATION_PROTOCOLS={
  // ——— GLP-1 / Weight ———
- 'Tirzepatide':{vialMg:10,bacMl:2,intro:'Dual GIP/GLP-1 agonist. Titrate weekly. BioVantix protocol caps at 5mg/wk.',schedule:[{weeks:'Week 1–4',dose:2.5,freq:'Once weekly',label:'2.5mg — Starting (50u with 10mg+2mL)'},{weeks:'Week 5+',dose:5,freq:'Once weekly',label:'5mg — Maintenance / Max (100u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. 5mg/wk is BioVantix max dose. Do not exceed.'},
- 'Retatrutide':{vialMg:10,bacMl:2,intro:'Triple GLP-1/GIP/Glucagon agonist. Strongest GLP-1 class peptide.',schedule:[{weeks:'Week 1–4',dose:2,freq:'Once weekly',label:'2mg — Starting (40u with 10mg+2mL)'},{weeks:'Week 5+',dose:4,freq:'Once weekly',label:'4mg — Max (80u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. BioVantix max 4mg/wk. Never skip titration.'},
+ 'Tirzepatide':{vialMg:15,bacMl:3,intro:'Dual GIP/GLP-1 agonist. Titrate weekly. Heal Peptides protocol caps at 5mg/wk.',schedule:[{weeks:'Week 1–4',dose:2.5,freq:'Once weekly',label:'2.5mg — Starting (50u with 15mg+3mL)'},{weeks:'Week 5+',dose:5,freq:'Once weekly',label:'5mg — Maintenance / Max (100u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 15mg + 3mL BAC = 5mg/mL. 5mg/wk is Heal max dose. Do not exceed.'},
+ 'Retatrutide':{vialMg:20,bacMl:4,intro:'Triple GLP-1/GIP/Glucagon agonist. Strongest GLP-1 class peptide.',schedule:[{weeks:'Week 1–4',dose:2,freq:'Once weekly',label:'2mg — Starting (40u with 20mg+4mL)'},{weeks:'Week 5+',dose:4,freq:'Once weekly',label:'4mg — Max (80u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'20mg + 4mL BAC = 5mg/mL | 10mg + 2mL BAC = 5mg/mL. Heal max 4mg/wk. Never skip titration.'},
  'Mazdutide':{vialMg:10,bacMl:2,intro:'GLP-1/Glucagon dual agonist. Once weekly. Promising weight & metabolic results.',schedule:[{weeks:'Week 1–4',dose:2,freq:'Once weekly',label:'2mg — Starting (40u)'},{weeks:'Week 5+',dose:4,freq:'Once weekly',label:'4mg — Max (80u)'}],notes:'SubQ — same day each week (Monday recommended).',warning:'Vial 10mg + 2mL BAC = 5mg/mL. BioVantix max 4mg/wk.'},
  'Cagrilintide':{vialMg:10,bacMl:2,intro:'Long-acting amylin analog. Pairs with GLP-1s for synergy.',schedule:[{weeks:'Week 1–2',dose:0.25,freq:'Once weekly',label:'0.25mg — Starter (5u)'},{weeks:'Week 3–4',dose:0.5,freq:'Once weekly',label:'0.5mg (10u)'},{weeks:'Week 5–6',dose:1,freq:'Once weekly',label:'1mg (20u)'},{weeks:'Week 7–8',dose:2,freq:'Once weekly',label:'2mg (40u)'},{weeks:'Week 9+',dose:4.5,freq:'Once weekly',label:'4.5mg — Max (90u)'}],notes:'SubQ — same day each week. Can stack with Semaglutide or Tirzepatide.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. Escalate by 0.5–1mg/wk.'},
  'Semaglutide':{vialMg:10,bacMl:2,intro:'GLP-1 receptor agonist. Weekly injection. Gradual titration over 3–4 months.',schedule:[{weeks:'Week 1–4',dose:0.25,freq:'Once weekly',label:'0.25mg (5u)'},{weeks:'Week 5–8',dose:0.5,freq:'Once weekly',label:'0.5mg (10u)'},{weeks:'Week 9–12',dose:1.0,freq:'Once weekly',label:'1.0mg (20u)'},{weeks:'Week 13+',dose:1.7,freq:'Once weekly',label:'1.7mg (34u)'},{weeks:'Maintenance',dose:2.4,freq:'Once weekly',label:'2.4mg max (48u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. Nausea common at start. Stay hydrated.'},
 
  // ——— Recovery / Healing ———
- 'BPC-157':{vialMg:5,bacMl:2.5,intro:'Body Protection Compound. SubQ near injury or abdomen. 4–6 week cycles.',schedule:[{weeks:'5mg vial',dose:0.3,freq:'Daily',label:'300mcg (15u with 5mg+2.5mL)'},{weeks:'15mg vial',dose:0.5,freq:'Daily',label:'500mcg (10u with 15mg+3mL)'}],notes:'SubQ as close to injury as possible, or abdomen for systemic effect. 5 days on / 2 days off, 4–6 weeks per cycle.',warning:'5mg + 2.5mL BAC = 2mg/mL. 15mg + 3mL BAC = 5mg/mL.'},
- 'TB-500':{vialMg:5,bacMl:2.5,intro:'Tissue regeneration peptide. Pairs well with BPC-157 for recovery.',schedule:[{weeks:'2mg vial',dose:0.1,freq:'Daily',label:'100–200mcg (10–20u with 2mg+2mL)'},{weeks:'5mg vial',dose:0.2,freq:'Daily',label:'200–400mcg (10–20u with 5mg+2.5mL)'}],notes:'SubQ or IM. 5 days on / 2 days off, 4–5 weeks per cycle.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
+ 'BPC-157':{vialMg:10,bacMl:2,intro:'Body Protection Compound. SubQ near injury or abdomen. 4–6 week cycles.',schedule:[{weeks:'Standard dose',dose:0.3,freq:'Daily',label:'300mcg (6u with 10mg+2mL)'},{weeks:'Higher dose',dose:0.5,freq:'Daily',label:'500mcg (10u with 10mg+2mL)'}],notes:'SubQ as close to injury as possible, or abdomen for systemic effect. 5 days on / 2 days off, 4–6 weeks per cycle.',warning:'10mg + 2mL BAC = 5mg/mL.'},
+ 'TB-500':{vialMg:10,bacMl:2,intro:'Tissue regeneration peptide. Pairs well with BPC-157 for recovery.',schedule:[{weeks:'Starter dose',dose:2,freq:'Weekly',label:'2mg (40u with 10mg+2mL)'},{weeks:'Higher dose',dose:5,freq:'Weekly',label:'5mg (100u with 10mg+2mL)'}],notes:'SubQ or IM. 5 days on / 2 days off, 4–5 weeks per cycle.',warning:'10mg + 2mL BAC = 5mg/mL.'},
  'GHK-Cu':{vialMg:50,bacMl:3,intro:'Copper peptide. Skin & hair regeneration. Reconstitute at 16.7mg/mL.',schedule:[{weeks:'Standard',dose:0.835,freq:'Daily or 5x/week',label:'835mcg (5u with 50mg+3mL)'},{weeks:'Advanced',dose:1.666,freq:'Daily',label:'1666mcg (10u)'}],notes:'SubQ — abdomen or scalp area. 5 on / 2 off, 6 weeks on / 2 weeks off cycle.',warning:'50mg + 3mL BAC = 16.7mg/mL. Effects plateau above 2mg/day.'},
  'IGF-1 LR3':{vialMg:1,bacMl:2.5,intro:'Long-acting IGF-1 analog. Tissue growth and recovery.',schedule:[{weeks:'Standard',dose:0.04,freq:'Daily',label:'40–80mcg (10–20u with 1mg+2.5mL)'}],notes:'SubQ — 5 days on / 2 days off, 2.5–5 weeks per cycle.',warning:'1mg + 2.5mL BAC = 0.4mg/mL.'},
  'AOD9604':{vialMg:2,bacMl:2,intro:'GH fragment for fat loss. No effect on blood sugar or IGF-1.',schedule:[{weeks:'Standard',dose:0.3,freq:'Daily',label:'300mcg (30u with 2mg+2mL)'}],notes:'SubQ AM fasted. 5 days on / 2 days off, 6 weeks per cycle.',warning:'2mg + 2mL BAC = 1mg/mL.'},
@@ -577,9 +775,9 @@ const TITRATION_PROTOCOLS={
  'CJC-1295 (no DAC)':{vialMg:5,bacMl:2.5,intro:'GHRH analog. Pairs with Ipamorelin for natural GH pulse.',schedule:[{weeks:'Standard',dose:0.1,freq:'Daily',label:'100–200mcg (10–20u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. 5 on / 2 off recommended.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
  'CJC-1295 DAC':{vialMg:2,bacMl:2,intro:'Long-acting CJC. Twice weekly only — do NOT take daily.',schedule:[{weeks:'Standard',dose:0.1,freq:'2x per week',label:'100mcg (20u with 2mg+2mL)'},{weeks:'Higher',dose:0.3,freq:'2x per week',label:'300mcg (30u)'}],notes:'SubQ — Monday & Thursday for example. Long half-life means continuous GH bump.',warning:'2mg + 2mL BAC = 1mg/mL. Never daily — desensitization risk.'},
  'Sermorelin':{vialMg:5,bacMl:2.5,intro:'GHRH analog — promotes natural GH release.',schedule:[{weeks:'Standard',dose:0.2,freq:'Daily',label:'200mcg (10u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. 5 on / 2 off, 8 weeks on / 4 weeks off.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
- 'Tesamorelin':{vialMg:2,bacMl:1,intro:'GHRH analog approved for visceral fat reduction.',schedule:[{weeks:'Standard',dose:1,freq:'Daily AM',label:'1mg (50u with 2mg+1mL)'}],notes:'SubQ AM fasted 30–60min before food.',warning:'2mg + 1mL BAC = 2mg/mL. High volume vs other peptides.'},
+ 'Tesamorelin':{vialMg:10,bacMl:2,intro:'GHRH analog approved for visceral fat reduction.',schedule:[{weeks:'Standard',dose:1,freq:'Daily AM',label:'1mg (20u with 10mg+2mL)'}],notes:'SubQ AM fasted 30–60min before food. 1 vial = 10 doses.',warning:'10mg + 2mL BAC = 5mg/mL.'},
  'GHRP-2':{vialMg:5,bacMl:3,intro:'GH releaser — stronger than Ipamorelin but spikes cortisol/prolactin.',schedule:[{weeks:'5mg vial',dose:0.166,freq:'Daily',label:'166mcg (10u with 5mg+3mL)'},{weeks:'10mg vial',dose:0.333,freq:'Daily',label:'333mcg (10u with 10mg+3mL)'}],notes:'SubQ before bed empty stomach.',warning:'Cortisol/prolactin elevation — not for daily long-term use.'},
- 'Epithalon':{vialMg:10,bacMl:1,intro:'Pineal peptide — telomere & sleep support.',schedule:[{weeks:'Cycle',dose:10,freq:'Every 3 days',label:'10mg full vial (100u) × 5 doses over 15 days'}],notes:'SubQ before bed. One full vial every 3 days. Repeat protocol every 4 months.',warning:'10mg + 1mL BAC = 10mg/mL. 100u = 1cc — use full insulin syringe.'},
+ 'Epithalon':{vialMg:10,bacMl:2,intro:'Pineal peptide — telomere & sleep support.',schedule:[{weeks:'Standard',dose:1,freq:'Daily',label:'1mg (20u with 10mg+2mL)'},{weeks:'Higher',dose:2,freq:'Daily',label:'2mg (40u with 10mg+2mL)'}],notes:'SubQ before bed. Cycles of 10–20 days. Repeat twice yearly.',warning:'10mg + 2mL BAC = 5mg/mL. Start at 1mg, increase as tolerated.'},
 
  // ——— Cognitive / Mood ———
  'Semax':{vialMg:10,bacMl:3,intro:'Russian nootropic peptide. Focus, memory, neuroprotection.',schedule:[{weeks:'Standard',dose:0.166,freq:'Daily AM',label:'166mcg (6u with 10mg+3mL)'}],notes:'SubQ or intranasal. Morning only. 2–4 week cycles.',warning:'10mg + 3mL BAC = 3.3mg/mL.'},
@@ -598,21 +796,21 @@ const TITRATION_PROTOCOLS={
  'Melanotan II':{vialMg:10,bacMl:3,intro:'Tanning peptide. Start very low — nausea common.',schedule:[{weeks:'Starter',dose:0.166,freq:'Daily',label:'166mcg (5u with 10mg+3mL)'}],notes:'SubQ. Start 0.5mg, titrate slowly. Sun exposure enhances effect.',warning:'10mg + 3mL BAC = 3.3mg/mL.'},
 
  // ——— Add-ons (HEAL catalog) ———
- 'NAD+':{vialMg:500,bacMl:2,intro:'Cellular energy & longevity coenzyme. Subcutaneous protocol.',schedule:[{weeks:'Standard',dose:100,freq:'2x per week',label:'100mg (40u with 500mg+2mL)'},{weeks:'Loading',dose:250,freq:'Weekly',label:'250mg (100u = full syringe)'}],notes:'SubQ slowly — some users report flushing. AM preferred.',warning:'500mg + 2mL BAC = 250mg/mL. Inject slowly to minimize flushing.'},
+ 'NAD+':{vialMg:500,bacMl:5,intro:'Cellular energy & longevity coenzyme. Subcutaneous protocol.',schedule:[{weeks:'Starting',dose:10,freq:'Daily',label:'10mg (10u with 500mg+5mL)'},{weeks:'Standard',dose:25,freq:'Daily',label:'25mg (25u with 500mg+5mL)'},{weeks:'Advanced',dose:50,freq:'Daily',label:'50mg (50u with 500mg+5mL)'}],notes:'SubQ slowly — some users report flushing. AM preferred. Start low and work upward based on tolerance.',warning:'500mg + 5mL BAC = 100mg/mL. Inject slowly to minimize flushing.'},
  'KPV':{vialMg:5,bacMl:2,intro:'Anti-inflammatory peptide. Often stacked with BPC-157 for gut healing.',schedule:[{weeks:'Standard',dose:0.5,freq:'Daily',label:'500mcg (20u with 5mg+2mL)'}],notes:'SubQ daily. Can also be used orally for gut issues.',warning:'5mg + 2mL BAC = 2.5mg/mL.'},
 };
 
 // Quick-fill suggestions (BioVantix doses)
 const PEP_PROTOCOLS={
  // GLP-1 / Weight
- 'Tirzepatide':{dose:'2.5mg',freq:'Weekly',notes:'SubQ weekly. 10mg vial + 2mL BAC. Start at 2.5mg, max 5mg/wk.'},
- 'Retatrutide':{dose:'2mg',freq:'Weekly',notes:'SubQ weekly. 10mg vial + 2mL BAC. Max 4mg/wk.'},
+ 'Tirzepatide':{dose:'2.5mg',freq:'Weekly',notes:'SubQ weekly. 15mg vial + 3mL BAC = 5mg/mL. Start at 2.5mg, max 5mg/wk.'},
+ 'Retatrutide':{dose:'2mg',freq:'Weekly',notes:'SubQ weekly. 20mg+4mL BAC = 5mg/mL | 10mg+2mL BAC = 5mg/mL. Max 4mg/wk.'},
  'Mazdutide':{dose:'2mg',freq:'Weekly',notes:'SubQ weekly. 10mg vial + 2mL BAC. Max 4mg/wk.'},
  'Cagrilintide':{dose:'250mcg',freq:'Weekly',notes:'SubQ weekly. 10mg + 2mL BAC. Escalate by 0.5–1mg/wk to max 4.5mg.'},
  'Semaglutide':{dose:'0.25mg',freq:'Weekly',notes:'SubQ weekly. 10mg + 2mL BAC. Titrate to 2.4mg max.'},
  // Recovery
- 'BPC-157':{dose:'300mcg',freq:'Daily',notes:'SubQ near injury or abdomen. 5mg vial + 2.5mL BAC. 5 on / 2 off, 4–6wk.'},
- 'TB-500':{dose:'200mcg',freq:'Daily',notes:'SubQ or IM. 5mg vial + 2.5mL BAC. 5 on / 2 off.'},
+ 'BPC-157':{dose:'300mcg',freq:'Daily',notes:'SubQ near injury or abdomen. 10mg vial + 2mL BAC = 5mg/mL. 5 on / 2 off, 4–6wk.'},
+ 'TB-500':{dose:'2mg',freq:'Weekly',notes:'SubQ or IM. 10mg vial + 2mL BAC = 5mg/mL. 5 on / 2 off.'},
  'GHK-Cu':{dose:'835mcg',freq:'Daily',notes:'SubQ abdomen. 50mg vial + 3mL BAC = 16.7mg/mL.'},
  'IGF-1 LR3':{dose:'40mcg',freq:'Daily',notes:'SubQ. 1mg vial + 2.5mL BAC. 5 on / 2 off, 2.5–5 weeks.'},
  'AOD9604':{dose:'300mcg',freq:'Daily AM',notes:'SubQ AM fasted. 2mg vial + 2mL BAC. 6 weeks on/off.'},
@@ -622,9 +820,9 @@ const PEP_PROTOCOLS={
  'Ipamorelin / CJC blend':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5 on / 2 off.'},
  'CJC-1295 DAC':{dose:'100mcg',freq:'2x per week',notes:'SubQ. 2mg vial + 2mL BAC. NEVER daily — desensitization risk.'},
  'Sermorelin':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5mg + 2.5mL BAC.'},
- 'Tesamorelin':{dose:'1mg',freq:'Daily AM',notes:'AM fasted 30–60min before food. 2mg vial + 1mL BAC.'},
+ 'Tesamorelin':{dose:'1mg',freq:'Daily AM',notes:'AM fasted 30–60min before food. 10mg vial + 2mL BAC = 5mg/mL. 1 vial = 10 doses.'},
  'GHRP-2':{dose:'166mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5mg + 3mL BAC.'},
- 'Epithalon':{dose:'10mg',freq:'Every 3 days x15 days',notes:'Before bed. 10mg vial + 1mL BAC. Full vial each dose.'},
+ 'Epithalon':{dose:'1–2mg',freq:'Daily (10–20 day cycles)',notes:'Before bed. 10mg vial + 2mL BAC = 5mg/mL. 20–40u per dose. Repeat twice yearly.'},
  // Cognitive
  'Semax':{dose:'166mcg',freq:'Daily AM',notes:'SubQ or intranasal. Morning only. 10mg + 3mL BAC.'},
  'Selank':{dose:'100mcg',freq:'Daily',notes:'Intranasal or SubQ. 5mg + 3mL BAC.'},
@@ -638,16 +836,16 @@ const PEP_PROTOCOLS={
  'PT-141':{dose:'500mcg',freq:'As needed',notes:'1–2h before activity. 10mg vial + 2mL BAC. Not daily.'},
  'Melanotan II':{dose:'166mcg',freq:'Daily — start low',notes:'SubQ. 10mg + 3mL BAC. Sun exposure enhances effect.'},
  // Add-ons
- 'NAD+':{dose:'100mg',freq:'2x per week',notes:'SubQ slow injection. 500mg vial + 2mL BAC = 250mg/mL.'},
+ 'NAD+':{dose:'10–50mg',freq:'Daily',notes:'SubQ slow injection. 500mg vial + 5mL BAC = 100mg/mL. Start 10mg (10u), increase slowly.'},
  'KPV':{dose:'500mcg',freq:'Daily',notes:'SubQ or oral. 5mg + 2mL BAC. Stack with BPC-157.'},
  // Blends (kept as-is for product compatibility)
- 'Glow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
+ 'Glow Blend':{dose:'4mg',freq:'Daily',notes:'SubQ daily. 60mg vial + 3mL BAC = 20mg/mL. 20u per dose.'},
  'Klow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
 };
 
 const GOALS={
  recovery:{label:'Recovery & healing',color:'#1D9E75',stack:[{name:'BPC-157',dose:'300mcg',freq:'Daily',sched:'SubQ near injury or abdomen. 5mg+2.5mL BAC. 5 on/2 off.',color:'#1D9E75',units:15},{name:'TB-500',dose:'200mcg',freq:'Daily',sched:'SubQ or IM. 5mg+2.5mL BAC.',color:'#1a6fc4',units:10},{name:'GHK-Cu',dose:'835mcg',freq:'Daily',sched:'SubQ abdomen. 50mg+3mL BAC = 16.7mg/mL.',color:'#534AB7',units:5}],days:['M','T','W','T','F','S','S'],patterns:['done','done','done','today','sched','sched','off']},
- weight:{label:'Weight loss protocol',color:'#1a6fc4',stack:[{name:'Retatrutide',dose:'2mg (start)',freq:'Weekly',sched:'10mg+2mL BAC. Max 4mg/wk.',color:'#1D9E75',units:40},{name:'Tirzepatide',dose:'2.5mg (start)',freq:'Weekly',sched:'10mg+2mL BAC. Max 5mg/wk.',color:'#1a6fc4',units:50},{name:'Cagrilintide',dose:'250mcg (start)',freq:'Weekly',sched:'Stack with Tirze/Sema. 10mg+2mL BAC.',color:'#185FA5',units:5},{name:'AOD9604',dose:'300mcg',freq:'Daily AM',sched:'AM fasted. 2mg+2mL BAC. 6wk on/off.',color:'#534AB7',units:30}],days:['M','T','W','T','F','S','S'],patterns:['off','off','off','today','off','off','sched']},
+ weight:{label:'Weight loss protocol',color:'#1a6fc4',stack:[{name:'Retatrutide',dose:'2mg (start)',freq:'Weekly',sched:'20mg+4mL BAC = 5mg/mL. Max 4mg/wk.',color:'#1D9E75',units:40},{name:'Tirzepatide',dose:'2.5mg (start)',freq:'Weekly',sched:'15mg+3mL BAC = 5mg/mL. Max 5mg/wk.',color:'#1a6fc4',units:50},{name:'Cagrilintide',dose:'250mcg (start)',freq:'Weekly',sched:'Stack with Tirze/Sema. 10mg+2mL BAC.',color:'#185FA5',units:5},{name:'AOD9604',dose:'300mcg',freq:'Daily AM',sched:'AM fasted. 2mg+2mL BAC. 6wk on/off.',color:'#534AB7',units:30}],days:['M','T','W','T','F','S','S'],patterns:['off','off','off','today','off','off','sched']},
  performance:{label:'Performance protocol',color:'#BA7517',stack:[{name:'Ipamorelin / CJC blend',dose:'200mcg',freq:'Daily before bed',sched:'Empty stomach. 5mg+2.5mL BAC.',color:'#BA7517',units:10},{name:'MOTS-C',dose:'2.5mg',freq:'Weekly',sched:'SubQ once weekly. 10mg+1mL BAC.',color:'#1a6fc4',units:25},{name:'Semax',dose:'166mcg',freq:'Daily AM',sched:'SubQ or intranasal. Morning only.',color:'#534AB7',units:6}],days:['M','T','W','T','F','S','S'],patterns:['done','done','done','today','sched','sched','off']},
  longevity:{label:'Anti-aging protocol',color:'#534AB7',stack:[{name:'Epithalon',dose:'10mg',freq:'Every 3 days x15 days',sched:'Before bed. 10mg+1mL BAC. Full vial.',color:'#534AB7',units:100},{name:'GHK-Cu',dose:'835mcg',freq:'Daily',sched:'SubQ abdomen. 50mg+3mL BAC.',color:'#1D9E75',units:5},{name:'Thymosin Alpha-1',dose:'400mcg',freq:'2x per week',sched:'SubQ. 2mg+1mL BAC. Immune support.',color:'#1a6fc4',units:20}],days:['M','T','W','T','F','S','S'],patterns:['done','done','off','today','sched','off','off']},
 };
@@ -740,6 +938,8 @@ function nav(id,btn){
  if(id==='home')renderHome();
  if(id==='track')renderTracker();
  if(id==='proto'){renderProto();renderCustomStack();}
+ if(id==='admin')adminLoad();
+ if(id==='labs')labsRender();
 }
 
 function switchMode(mode,btn){
@@ -928,16 +1128,25 @@ function av_recalc(){
  const doseEl=document.getElementById('av-doses-calc');
  const unitsEl=document.getElementById('av-units-calc');
  const volEl=document.getElementById('av-vol-calc');
+ const concEl=document.getElementById('av-conc-calc');
+ const noteEl=document.getElementById('av-note');
  if(!doseMg||!vialMg||!bacMl){
-  doseEl.textContent='—';unitsEl.textContent='—';volEl.textContent='—';return;
+  if(doseEl)doseEl.textContent='—';
+  if(unitsEl)unitsEl.textContent='—';
+  if(volEl)volEl.textContent='—';
+  if(concEl)concEl.textContent='—';
+  return;
  }
  const doses=Math.floor(vialMg/doseMg);
  const concMgPerMl=vialMg/bacMl;
  const volMl=doseMg/concMgPerMl;
  const units=Math.round(volMl*100);
- doseEl.textContent=doses+' doses';
- unitsEl.textContent=units+' units';
- volEl.textContent=volMl.toFixed(3)+' mL';
+ if(concEl)concEl.textContent=(concMgPerMl>=1?concMgPerMl.toFixed(2)+' mg/mL':Math.round(concMgPerMl*1000)+' mcg/mL');
+ if(unitsEl)unitsEl.textContent=units+' units';
+ if(volEl)volEl.textContent=volMl.toFixed(3)+' mL';
+ if(doseEl)doseEl.textContent=doses+' doses';
+ // Explain what BAC changes vs what stays fixed
+ if(noteEl)noteEl.textContent='Las unidades y el volumen cambian según el BAC. Las dosis por vial dependen solo del mg del vial ÷ tu dosis ('+(vialMg*1000)+'µg ÷ '+(doseMg*1000).toFixed(0)+'µg = '+doses+').';
 }
 function hideModal(){document.getElementById('add-modal').classList.remove('show');}
 function addVial(){
@@ -1006,10 +1215,15 @@ function doLogin(){
  const ni=window.netlifyIdentity;
  if(!ni){showAuthErr('Auth service not available.');return;}
  clearAuthMsg();
+ const btn=document.querySelector('#auth-login .auth-btn');
+ if(btn){btn.disabled=true;btn.textContent='Signing in…';}
  // Use GoTrue API directly
  ni.gotrue.login(email,pass,true)
  .then(user=>{ni.store.user=user;ni.store.saving=false;ni.emit('login',user);})
- .catch(err=>showAuthErr(err.message||'Invalid email or password.'));
+ .catch(err=>{
+  showAuthErr(err.message||'Invalid email or password.');
+  if(btn){btn.disabled=false;btn.textContent='Sign in →';}
+ });
 }
 
 function doRegister(){
@@ -1055,6 +1269,7 @@ function showApp(user){
  const displayName=(user.user_metadata&&user.user_metadata.full_name)||user.email||'User';
  document.getElementById('user-name-tag').textContent=displayName.split(' ')[0];
  load();calcFromMcg();renderHome();renderProto();renderCustomStack();renderTracker();
+ setTimeout(initAdminTab,200);
 }
 
 function showAuth(){
@@ -1080,21 +1295,51 @@ document.addEventListener('DOMContentLoaded',()=>{
  showApp({id:'dev',email:'dev@local',user_metadata:{full_name:'Dev User'}});
  return;
  }
+ // ---- Handle recovery token from email link ----
+ const hashParams=new URLSearchParams(window.location.hash.replace(/^#/,''));
+ const recoveryToken=hashParams.get('recovery_token') || hashParams.get('token');
+ const tokenType=hashParams.get('type');
+ const isRecovery=!!(recoveryToken||(tokenType==='recovery'));
+ if(isRecovery){history.replaceState(null,'',window.location.pathname);}
+ window._inRecoveryMode=isRecovery;
+
  ni.on('init', user=>{
- if(user){showApp(user);}else{showAuth();}
+  // If login already completed (race: init fires after login event), don't reset
+  if(currentUser) return;
+  if(window._inRecoveryMode){
+   // Don't auto-enter app — wait for login event which fires after token exchange
+   showAuth();
+   document.getElementById('auth-tabs').style.display='none';
+   document.getElementById('auth-login').style.display='none';
+   document.getElementById('auth-register').style.display='none';
+   document.getElementById('auth-reset').style.display='block';
+   showAuthOk('🔐 Enter your new password below.');
+   return;
+  }
+  if(user){showApp(user);}else{showAuth();}
  });
  ni.on('login', user=>{
- // Apply pending meta if from signup
- const meta=localStorage.getItem('heal-pending-meta');
- if(meta){
- try{
- const m=JSON.parse(meta);
- ni.currentUser().update({data:m});
- localStorage.removeItem('heal-pending-meta');
- }catch(e){}
- }
- ni.close();
- showApp(user);
+  // If arriving from a recovery email link, show reset form instead of app
+  if(window._inRecoveryMode){
+   showAuth();
+   document.getElementById('auth-tabs').style.display='none';
+   document.getElementById('auth-login').style.display='none';
+   document.getElementById('auth-register').style.display='none';
+   document.getElementById('auth-reset').style.display='block';
+   showAuthOk('🔐 Enter your new password below.');
+   return;
+  }
+  // Apply pending meta if from signup
+  const meta=localStorage.getItem('heal-pending-meta');
+  if(meta){
+   try{
+    const m=JSON.parse(meta);
+    ni.currentUser().update({data:m});
+    localStorage.removeItem('heal-pending-meta');
+   }catch(e){}
+  }
+  ni.close();
+  showApp(user);
  });
  ni.on('logout',()=>{
  currentUser=null;
@@ -1112,6 +1357,46 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ============================================
 
 // --- Forgot password / Resend verification ---
+function filterShop(q){
+ const term=q.toLowerCase().trim();
+ document.querySelectorAll('#pg-shop .prod-row').forEach(row=>{
+  const txt=row.textContent.toLowerCase();
+  row.style.display=(!term||txt.includes(term))?'':'none';
+ });
+ document.querySelectorAll('#pg-shop .shop-section').forEach(sec=>{
+  const visible=[...sec.querySelectorAll('.prod-row')].some(r=>r.style.display!=='none');
+  sec.style.display=(!term||visible)?'':'none';
+ });
+}
+
+function togglePass(id,btn){
+ const inp=document.getElementById(id);
+ if(!inp)return;
+ if(inp.type==='password'){inp.type='text';btn.textContent='🚫';btn.classList.add('on');}
+ else{inp.type='password';btn.textContent='👁';btn.classList.remove('on');}
+}
+
+function doSetNewPassword(){
+ const pass=document.getElementById('reset-pass').value;
+ const pass2=document.getElementById('reset-pass2').value;
+ if(!pass||pass.length<8){showAuthErr('Password must be at least 8 characters.');return;}
+ if(pass!==pass2){showAuthErr('Passwords do not match.');return;}
+ clearAuthMsg();
+ const ni=window.netlifyIdentity;
+ if(!ni){showAuthErr('Auth service not available.');return;}
+ // At this point Netlify Identity has already exchanged the recovery token
+ // and the user is logged in — just update the password
+ const u=ni.currentUser();
+ if(!u){showAuthErr('Session expired. Please request a new reset link.');return;}
+ u.update({password:pass})
+  .then(()=>{
+   window._inRecoveryMode=false;
+   showAuthOk('✅ Password updated! Entering app...');
+   setTimeout(()=>{ showApp(u); },1200);
+  })
+  .catch(err=>showAuthErr(err.message||'Could not update password. Please request a new reset link.'));
+}
+
 function doForgotPassword(){
  const email=document.getElementById('l-email').value.trim();
  const ni=window.netlifyIdentity;
@@ -1144,12 +1429,51 @@ function doResendVerification(){
  }).catch(()=>showAuthErr('Network error. Try again.'));
 }
 
-// --- WhatsApp order ---
+// --- Cart ---
+let _cart=[];
+
 function orderWA(btn){
  const row=btn.closest('.prod-row');
- const name=row?row.querySelector('.pname').textContent.trim():'a product';
- const price=row?row.querySelector('.pprice').textContent.trim():'';
- const msg=encodeURIComponent('Hola! Quiero ordenar '+name+(price?' ('+price+')':'')+'. ¿Disponibilidad?');
+ const name=row?row.querySelector('.pname').textContent.trim():'';
+ const priceStr=row?row.querySelector('.pprice').textContent.trim():'';
+ const price=parseFloat(priceStr.replace('$',''))||0;
+ const idx=_cart.findIndex(i=>i.name===name);
+ if(idx>=0){
+  _cart.splice(idx,1);
+  btn.textContent='+ Add';
+  btn.classList.remove('in-cart');
+ }else{
+  _cart.push({name,price});
+  btn.textContent='✓ Added';
+  btn.classList.add('in-cart');
+ }
+ cartRender();
+}
+
+function cartRender(){
+ const bar=document.getElementById('cart-bar');
+ const countEl=document.getElementById('cart-count-num');
+ const totalEl=document.getElementById('cart-total-num');
+ const listEl=document.getElementById('cart-items-list');
+ if(!bar)return;
+ if(_cart.length===0){bar.classList.remove('show');return;}
+ bar.classList.add('show');
+ countEl.textContent=_cart.length;
+ totalEl.textContent=_cart.reduce((a,i)=>a+i.price,0).toFixed(0);
+ listEl.textContent=_cart.map(i=>i.name+(i.price?' ($'+i.price+')':'')).join(' · ');
+}
+
+function cartClear(){
+ _cart=[];
+ document.querySelectorAll('.padd.in-cart').forEach(b=>{b.textContent='+ Add';b.classList.remove('in-cart');});
+ cartRender();
+}
+
+function cartOrderWA(){
+ if(!_cart.length)return;
+ const lines=_cart.map(i=>'- '+i.name+(i.price?' ($'+i.price+')':'')).join('%0A');
+ const total=_cart.reduce((a,i)=>a+i.price,0).toFixed(0);
+ const msg='Hola%2C+quiero+ordenar+los+siguientes+productos%3A%0A'+lines+'%0A%0ATotal%3A+%24'+total+'%0A%C2%BFCu%C3%A1ndo+est%C3%A1n+disponibles%3F';
  window.open('https://wa.me/50688970649?text='+msg,'_blank');
 }
 
@@ -1345,7 +1669,16 @@ showApp=async function(user){
 // --- Register Service Worker ---
 if('serviceWorker' in navigator){
  window.addEventListener('load',()=>{
-  navigator.serviceWorker.register('/sw.js').catch(err=>console.warn('SW registration failed:',err));
+  navigator.serviceWorker.register('/sw.js')
+   .then(reg=>{
+    // Auto-reload when SW takes control for the first time to avoid frozen state
+    if(!navigator.serviceWorker.controller){
+     navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      window.location.reload();
+     });
+    }
+   })
+   .catch(err=>console.warn('SW registration failed:',err));
  });
 }
 
@@ -1486,6 +1819,311 @@ nav=function(id,btn){
 };
 
 load();calcFromMcg();renderHome();renderProto();renderCustomStack();renderTracker();
+
+// ============================================
+// LABS — Blood Test Analyzer
+// ============================================
+let _labsFile = null;
+let _labsFileType = null;
+
+function labsFileSelected(input){
+ const file = input.files[0];
+ if(!file) return;
+ _labsFile = file;
+ _labsFileType = file.type || 'image/jpeg';
+ const preview = document.getElementById('labs-preview');
+ const previewImg = document.getElementById('labs-preview-img');
+ const previewName = document.getElementById('labs-preview-name');
+ const analyzeBtn = document.getElementById('labs-analyze-btn');
+ previewName.textContent = file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)';
+ if(file.type.startsWith('image/')){
+  const reader = new FileReader();
+  reader.onload = e => { previewImg.src = e.target.result; previewImg.style.display='block'; };
+  reader.readAsDataURL(file);
+ } else {
+  previewImg.style.display='none';
+ }
+ preview.style.display='block';
+ analyzeBtn.style.display='block';
+}
+
+async function labsAnalyze(){
+ if(!_labsFile){ alert('Please select a file first.'); return; }
+
+ // Get previous results for comparison
+ const stored = labsGetStored();
+ const previous = stored.length > 0 ? stored[stored.length-1] : null;
+
+ // Show loading
+ document.getElementById('labs-loading').style.display='block';
+ document.getElementById('labs-results').style.display='none';
+ document.getElementById('labs-empty').style.display='none';
+ document.getElementById('labs-analyze-btn').disabled=true;
+
+ try {
+  // Read file as base64
+  const base64 = await new Promise((resolve,reject)=>{
+   const reader = new FileReader();
+   reader.onload = e => resolve(e.target.result.split(',')[1]);
+   reader.onerror = reject;
+   reader.readAsDataURL(_labsFile);
+  });
+
+  const body = JSON.stringify({
+   imageBase64: base64,
+   mediaType: _labsFileType.startsWith('application/pdf') ? 'image/jpeg' : _labsFileType,
+   previousResults: previous
+  });
+
+  const res = await fetch('/.netlify/functions/analyze-labs', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body
+  });
+
+  if(!res.ok) throw new Error('Server error: ' + res.status);
+  const data = await res.json();
+  if(data.error) throw new Error(data.error);
+
+  // Save to storage
+  labsSave(data);
+  labsRender();
+
+  // Reset upload
+  _labsFile = null;
+  document.getElementById('labs-file').value='';
+  document.getElementById('labs-preview').style.display='none';
+  document.getElementById('labs-analyze-btn').style.display='none';
+
+ } catch(err){
+  alert('Analysis failed: ' + err.message);
+ } finally {
+  document.getElementById('labs-loading').style.display='none';
+  document.getElementById('labs-analyze-btn').disabled=false;
+ }
+}
+
+function labsKey(){ return (window._storagePrefix||'heal-') + 'labs'; }
+
+function labsGetStored(){
+ try{ return JSON.parse(localStorage.getItem(labsKey())||'[]'); }catch(e){ return []; }
+}
+
+function labsSave(data){
+ const stored = labsGetStored();
+ stored.push({ ...data, savedAt: new Date().toISOString() });
+ localStorage.setItem(labsKey(), JSON.stringify(stored));
+ // Sync to Supabase if available
+ if(window.supabaseSync && currentUser){
+  try{
+   fetch(SUPABASE_URL+'/rest/v1/hp_labs',{
+    method:'POST',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+    body:JSON.stringify({user_id:currentUser.id, data:stored, updated_at:new Date().toISOString()})
+   });
+  }catch(e){}
+ }
+}
+
+function labsRender(){
+ const stored = labsGetStored();
+ document.getElementById('labs-loading').style.display='none';
+ if(!stored.length){
+  document.getElementById('labs-empty').style.display='block';
+  document.getElementById('labs-results').style.display='none';
+  return;
+ }
+ document.getElementById('labs-empty').style.display='none';
+ document.getElementById('labs-results').style.display='block';
+
+ const latest = stored[stored.length-1];
+ const prev = stored.length > 1 ? stored[stored.length-2] : null;
+
+ // Date & summary
+ document.getElementById('labs-result-date').textContent = latest.date || latest.savedAt?.slice(0,10) || '';
+ document.getElementById('labs-summary-box').textContent = latest.summary || '';
+
+ // Markers
+ const container = document.getElementById('labs-markers-list');
+ container.innerHTML = (latest.markers||[]).map(m=>{
+  const statusColor = m.status==='high'?'#F09595':m.status==='low'?'#3aa0ff':'#5DCAA5';
+  const statusIcon = m.status==='high'?'⚠️':m.status==='low'?'⚠️':'✅';
+  let trendHtml = '';
+  if(m.change !== undefined && m.change !== null){
+   const pct = m.changePct !== undefined ? m.changePct.toFixed(1) : ((m.change/((m.previousValue||1))*100).toFixed(1));
+   const arrow = m.change > 0 ? '↑' : '↓';
+   const trendColor = m.trend==='improved'?'#5DCAA5':m.trend==='worsened'?'#F09595':'rgba(255,255,255,.4)';
+   trendHtml = `<span style="font-size:11px;color:${trendColor};margin-left:8px">${arrow} ${Math.abs(pct)}% vs prev</span>`;
+  }
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,.05)">
+   <div>
+    <span style="font-size:12px;color:#fff;font-weight:500">${statusIcon} ${m.name}</span>
+    ${trendHtml}
+    <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:2px">Ref: ${m.reference||'N/A'}</div>
+   </div>
+   <div style="text-align:right">
+    <div style="font-size:15px;font-weight:700;color:${statusColor}">${m.value} <span style="font-size:10px;font-weight:400">${m.unit||''}</span></div>
+    ${m.previousValue!==undefined?`<div style="font-size:10px;color:rgba(255,255,255,.3)">prev: ${m.previousValue}</div>`:''}
+   </div>
+  </div>`;
+ }).join('');
+
+ // History
+ if(stored.length > 1){
+  const histCard = document.getElementById('labs-history-card');
+  histCard.style.display='block';
+  const histList = document.getElementById('labs-history-list');
+  histList.innerHTML = stored.slice().reverse().map((r,i)=>{
+   const d = r.date || r.savedAt?.slice(0,10) || 'Unknown date';
+   const count = (r.markers||[]).length;
+   return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,.05)">
+    <div style="color:#fff;font-size:12px">${i===0?'🟢 Latest: ':'🔵 '}${d}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.4)">${count} markers</div>
+   </div>`;
+  }).join('');
+ }
+}
+
+// ============================================
+// ADMIN PANEL
+// ============================================
+const ADMIN_EMAILS=['henry@urbancr.net','henry@wercr.net'];
+
+function isAdmin(){
+ return currentUser && ADMIN_EMAILS.includes((currentUser.email||'').toLowerCase());
+}
+
+function initAdminTab(){
+ const btn=document.getElementById('admin-tab-btn');
+ if(btn) btn.style.display=isAdmin()?'':'none';
+}
+
+async function adminFetch(path,opts={}){
+ const url=SUPABASE_URL+'/rest/v1/'+path;
+ const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+ const r=await fetch(url,{...opts,headers:{...headers,...(opts.headers||{})}});
+ if(!r.ok)throw new Error(await r.text());
+ return r.json();
+}
+
+async function adminLoad(){
+ if(!isAdmin()){document.getElementById('pg-admin').innerHTML='<div style="padding:40px;text-align:center;color:rgba(255,255,255,.3)">Access denied.</div>';return;}
+ document.getElementById('admin-sub').textContent='Welcome, '+( currentUser.user_metadata?.full_name||currentUser.email);
+ await Promise.all([adminLoadUsers(),adminLoadDoses(),adminLoadStories()]);
+}
+
+async function adminLoadUsers(){
+ const el=document.getElementById('admin-users-list');
+ el.innerHTML='<span style="color:rgba(255,255,255,.35)">Loading...</span>';
+ try{
+  const rows=await adminFetch('hp_state?select=user_id,vials,streak,today_date,updated_at&order=updated_at.desc');
+  document.getElementById('adm-users').textContent=rows.length;
+  let totalVials=0;
+  rows.forEach(r=>{ try{totalVials+=(JSON.parse(r.vials||'[]')).length;}catch(e){} });
+  document.getElementById('adm-active').textContent=totalVials;
+  if(!rows.length){el.innerHTML='<span style="color:rgba(255,255,255,.3)">No users yet.</span>';return;}
+  el.innerHTML=rows.map((r,i)=>{
+   let vials=[];
+   try{vials=JSON.parse(r.vials||'[]');}catch(e){}
+   const lastSeen=r.updated_at?new Date(r.updated_at).toLocaleDateString('es-CR',{day:'2-digit',month:'short',year:'numeric'}):'—';
+   const uid=r.user_id||'unknown';
+   const short=uid.length>18?uid.slice(0,8)+'...'+uid.slice(-6):uid;
+   return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,.06)">
+    <div>
+     <div style="font-size:12px;color:#fff;font-weight:600;margin-bottom:2px">👤 ${short}</div>
+     <div style="font-size:11px;color:rgba(255,255,255,.35)">${vials.length} vial${vials.length!==1?'s':''} • streak ${r.streak||0}d • last: ${lastSeen}</div>
+     ${vials.length?'<div style="font-size:10px;color:#3aa0ff;margin-top:2px">'+vials.map(v=>v.name).join(', ')+'</div>':''}
+    </div>
+   </div>`;
+  }).join('');
+ }catch(e){
+  el.innerHTML='<span style="color:#F09595">❌ '+e.message+'</span>';
+ }
+}
+
+async function adminLoadDoses(){
+ const el=document.getElementById('admin-dose-list');
+ el.innerHTML='<span style="color:rgba(255,255,255,.35)">Loading...</span>';
+ try{
+  const since=new Date(Date.now()-7*24*3600*1000).toISOString().slice(0,10);
+  const rows=await adminFetch('hp_dose_log?select=user_id,date,done,total&order=date.desc&date=gte.'+since);
+  document.getElementById('adm-doses').textContent=rows.reduce((a,r)=>a+(r.done||0),0);
+  if(!rows.length){el.innerHTML='<span style="color:rgba(255,255,255,.3)">No doses logged yet.</span>';return;}
+  // Group by date
+  const byDate={};
+  rows.forEach(r=>{if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);});
+  el.innerHTML=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,entries])=>{
+   const totalDone=entries.reduce((a,r)=>a+(r.done||0),0);
+   const users=new Set(entries.map(r=>r.user_id)).size;
+   return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,.06)">
+    <div style="font-size:12px;color:#fff">${date}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.45)">${totalDone} doses • ${users} user${users!==1?'s':''}</div>
+   </div>`;
+  }).join('');
+ }catch(e){
+  el.innerHTML='<span style="color:#F09595">❌ '+e.message+'</span>';
+ }
+}
+
+async function adminLoadStories(){
+ const el=document.getElementById('admin-stories-list');
+ if(!el)return;
+ el.innerHTML='<span style="color:rgba(255,255,255,.35)">Loading...</span>';
+ try{
+  const rows=await adminFetch('hp_stories?select=id,author,peptide,published,created_at&order=created_at.desc&limit=30',
+   {headers:{'Prefer':''}});
+  if(!rows.length){el.innerHTML='<span style="color:rgba(255,255,255,.3)">No stories yet.</span>';return;}
+  el.innerHTML=rows.map(r=>{
+   const date=new Date(r.created_at).toLocaleDateString('es-CR',{day:'2-digit',month:'short'});
+   const badge=r.published?'<span style="color:#5DCAA5;font-size:10px">✓ Published</span>':'<span style="color:rgba(255,255,255,.3);font-size:10px">○ Draft</span>';
+   return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,.06)">
+    <div>
+     <div style="font-size:12px;color:#fff;font-weight:600">${r.author} • <span style="color:#3aa0ff">${r.peptide||'N/A'}</span></div>
+     <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px">${date} • ${badge}</div>
+    </div>
+    <button onclick="adminToggleStory('${r.id}',${!r.published})" style="background:${r.published?'rgba(226,75,74,.15)':'rgba(15,110,86,.15)'};border:0.5px solid ${r.published?'rgba(226,75,74,.4)':'rgba(29,158,117,.4)'};color:${r.published?'#F09595':'#5DCAA5'};border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:Inter,sans-serif">${r.published?'Unpublish':'Publish'}</button>
+   </div>`;
+  }).join('');
+ }catch(e){
+  el.innerHTML='<span style="color:#F09595">❌ '+e.message+'</span>';
+ }
+}
+
+async function adminToggleStory(id,publish){
+ try{
+  await adminFetch('hp_stories?id=eq.'+id,{
+   method:'PATCH',
+   headers:{'Prefer':'return=minimal'},
+   body:JSON.stringify({published:publish})
+  });
+  await adminLoadStories();
+ }catch(e){alert('Error: '+e.message);}
+}
+
+async function adminAddStory(){
+ const author=document.getElementById('adm-s-author').value.trim();
+ const text=document.getElementById('adm-s-text').value.trim();
+ if(!author||!text){alert('Author and text are required.');return;}
+ const pub=document.getElementById('adm-s-pub').value==='true';
+ try{
+  await adminFetch('hp_stories',{
+   method:'POST',
+   headers:{'Prefer':'return=minimal'},
+   body:JSON.stringify({
+    author,
+    location:document.getElementById('adm-s-location').value.trim(),
+    peptide:document.getElementById('adm-s-peptide').value.trim(),
+    duration:document.getElementById('adm-s-duration').value.trim(),
+    text,
+    published:pub
+   })
+  });
+  ['adm-s-author','adm-s-location','adm-s-peptide','adm-s-duration','adm-s-text'].forEach(id=>document.getElementById(id).value='');
+  await adminLoadStories();
+  showToast('Story saved!');
+ }catch(e){alert('Error: '+e.message);}
+}
+
 </script>
 </body>
 </html>
