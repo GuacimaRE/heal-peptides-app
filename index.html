@@ -1300,10 +1300,13 @@ document.addEventListener('DOMContentLoaded',()=>{
  const recoveryToken=hashParams.get('recovery_token') || hashParams.get('token');
  const tokenType=hashParams.get('type');
  const isRecovery=!!(recoveryToken||(tokenType==='recovery'));
- if(isRecovery){history.replaceState(null,'',window.location.pathname);}
+ // NOTE: do NOT clear the hash here — ni.init() needs it to exchange the token
+ // We clean it up after init processes it
  window._inRecoveryMode=isRecovery;
 
  ni.on('init', user=>{
+  // Clean up hash now that ni.init() has processed any tokens
+  if(window.location.hash) history.replaceState(null,'',window.location.pathname);
   // If login already completed (race: init fires after login event), don't reset
   if(currentUser) return;
   if(window._inRecoveryMode){
