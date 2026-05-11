@@ -37,7 +37,7 @@ exports.handler = async (event) => {
     </div>
 
     <!-- CTA Button -->
-    <a href="https://heal-peptides-app.netlify.app" 
+    <a href="https://healpeptides.net" 
        style="display:block;background:#1a6fc4;color:#fff;text-decoration:none;text-align:center;padding:15px;border-radius:12px;font-size:15px;font-weight:700;margin-bottom:28px">
       Open my HEAL App →
     </a>
