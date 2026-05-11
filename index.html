@@ -13,6 +13,7 @@
 <link rel="icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script>window._initialHash=window.location.hash;</script>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1301,10 +1302,12 @@ document.addEventListener('DOMContentLoaded',()=>{
  return;
  }
  // ---- Handle recovery token from email link ----
- const hashParams=new URLSearchParams(window.location.hash.replace(/^#/,''));
- const recoveryToken=hashParams.get('recovery_token') || hashParams.get('token');
+ // Use _initialHash (captured before Netlify Identity widget loaded) to avoid race
+ const rawHash=(window._initialHash||window.location.hash).replace(/^#/,'');
+ const hashParams=new URLSearchParams(rawHash);
+ const recoveryToken=hashParams.get('recovery_token')||hashParams.get('token')||hashParams.get('access_token');
  const tokenType=hashParams.get('type');
- const isRecovery=!!(recoveryToken||(tokenType==='recovery'));
+ const isRecovery=!!(recoveryToken&&(tokenType==='recovery'||hashParams.get('recovery_token')||hashParams.get('token')));
  // NOTE: do NOT clear the hash here — ni.init() needs it to exchange the token
  // We clean it up after init processes it
  window._inRecoveryMode=isRecovery;
