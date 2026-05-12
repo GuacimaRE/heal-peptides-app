@@ -37,7 +37,7 @@ exports.handler = async (event) => {
     </div>
 
     <!-- CTA Button -->
-    <a href="https://healpeptides.net" 
+    <a href="https://app.healpeptides.net" 
        style="display:block;background:#1a6fc4;color:#fff;text-decoration:none;text-align:center;padding:15px;border-radius:12px;font-size:15px;font-weight:700;margin-bottom:28px">
       Open my HEAL App →
     </a>
@@ -61,9 +61,26 @@ exports.handler = async (event) => {
       </table>
     </div>
 
+    <!-- Install instructions -->
+    <div style="background:#0a1628;border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:10px;letter-spacing:.8px;text-transform:uppercase">Install as app on your phone</div>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:5px 0;font-size:12px;color:rgba(255,255,255,.6)">
+            🐇 <strong style="color:rgba(255,255,255,.8)">iPhone:</strong> Open in Safari → tap Share → “Add to Home Screen”
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;font-size:12px;color:rgba(255,255,255,.6)">
+            🤖 <strong style="color:rgba(255,255,255,.8)">Android:</strong> Open in Chrome → tap menu (⋮) → “Add to Home Screen”
+          </td>
+        </tr>
+      </table>
+    </div>
+
     <!-- WhatsApp CTA -->
     <div style="background:#0a1628;border-radius:12px;padding:16px;text-align:center">
-      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:8px">Questions? We're here for you</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:8px">Questions? We’re here for you</div>
       <a href="https://wa.me/50688970649" style="color:#25D366;font-size:13px;font-weight:600;text-decoration:none">
         📱 WhatsApp us anytime
       </a>
