@@ -1,5 +1,5 @@
 // HEAL Peptides — Service Worker
-const CACHE_NAME = 'heal-peptides-v1';
+const CACHE_NAME = 'heal-peptides-v2';
 const ASSETS = [
   '/',
   '/index.html',

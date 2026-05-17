@@ -363,10 +363,24 @@ select option{background:#1a1a28}
  <div class="gcard" onclick="selectGoal(this,'longevity')"><div class="gi">🧬</div><div class="gn">Anti-aging</div><div class="gs">Longevity & skin</div></div>
  </div>
  </div>
- <div class="card"><div class="ct">Recommended stack</div><div id="stack-list"></div></div>
- <div class="card"><div class="ct">Weekly schedule</div><div id="proto-sched"></div></div>
- <button class="btn" onclick="activateQuickProtocol()">✓ Activate this protocol</button>
- <button class="btn-sm" onclick="shareQuickProtocol()" style="width:100%;margin-top:8px;background:#1D9E75">📄 Share this protocol</button>
+
+ <!-- Stack recommendation panel -->
+ <div id="quick-stack-rec" style="display:none">
+  <div class="card" style="background:linear-gradient(135deg,#0d1f3c,#0a0a14);border-color:#1a4a80">
+   <div style="font-size:11px;font-weight:700;color:#3aa0ff;letter-spacing:.05em;margin-bottom:10px">⭐ RECOMMENDED FOR YOUR GOAL</div>
+   <div id="qsr-content"></div>
+   <button class="btn" id="qsr-order-btn" onclick="quickStackOrder()" style="margin-top:12px">Setup Protocol & Order Stack →</button>
+   <button onclick="quickStackCustomize()" style="width:100%;background:transparent;border:none;color:rgba(255,255,255,.35);font-size:12px;padding:10px 0 2px;cursor:pointer;font-family:Inter,sans-serif">Customize instead</button>
+  </div>
+ </div>
+
+ <!-- Protocol detail (shown after customize or after stack order) -->
+ <div id="quick-protocol-detail" style="display:none">
+  <div class="card"><div class="ct">Recommended stack</div><div id="stack-list"></div></div>
+  <div class="card"><div class="ct">Weekly schedule</div><div id="proto-sched"></div></div>
+  <button class="btn" onclick="activateQuickProtocol()">✓ Activate this protocol</button>
+  <button class="btn-sm" onclick="shareQuickProtocol()" style="width:100%;margin-top:8px;background:#1D9E75">📄 Share this protocol</button>
+ </div>
  </div>
  <div class="mode-section" id="mode-custom">
  <div class="add-pep-box">
@@ -468,6 +482,27 @@ select option{background:#1a1a28}
 </div>
 
 <!-- SHOP -->
+<!-- LABS CONSENT MODAL -->
+<div id="labs-consent-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px">
+ <div style="background:#0f0f1a;border:1px solid rgba(26,111,196,.4);border-radius:18px;max-width:380px;width:100%;padding:28px 24px">
+  <div style="font-size:26px;text-align:center;margin-bottom:8px">🧬</div>
+  <div style="font-size:16px;font-weight:700;color:#fff;text-align:center;margin-bottom:6px">LAB ANALYSIS — IMPORTANT NOTICE</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.6);text-align:center;margin-bottom:18px;line-height:1.6">This tool provides AI-assisted analysis of bloodwork markers for <strong>EDUCATIONAL purposes only.</strong></div>
+  <div style="background:#0a1628;border:0.5px solid rgba(240,149,149,.3);border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.8">
+   ⚠️ This is <strong>NOT medical advice.</strong><br>
+   ⚠️ Does <strong>NOT</strong> replace consultation with a licensed healthcare provider.<br>
+   ⚠️ Results are categorical guidance, not specific recommendations.
+  </div>
+  <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:20px">
+   By proceeding, you acknowledge that:<br>
+   • You will discuss results with your doctor before any protocol change.<br>
+   • HEAL Peptides is not responsible for any health outcomes.
+  </div>
+  <button class="btn" onclick="labsConsentAgree()" style="width:100%;margin-bottom:10px">I UNDERSTAND AND AGREE</button>
+  <button onclick="labsConsentCancel()" style="width:100%;background:transparent;border:0.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);padding:12px;border-radius:10px;font-size:13px;cursor:pointer">Cancel</button>
+ </div>
+</div>
+
 <!-- LABS PAGE -->
 <div class="pg" id="pg-labs">
  <div class="ttl">🧬 Blood Labs</div>
@@ -520,6 +555,16 @@ select option{background:#1a1a28}
   <div style="font-size:40px;margin-bottom:12px">🧬</div>
   <div style="font-size:14px">No labs uploaded yet</div>
   <div style="font-size:12px;margin-top:6px">Upload your first blood test above</div>
+ </div>
+
+ <!-- Legal disclaimer (always visible) -->
+ <div style="background:#0a0a14;border:0.5px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;margin-top:16px;margin-bottom:24px">
+  <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.05em;margin-bottom:8px">🛡️ DISCLAIMER</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.3);line-height:1.7">
+   This AI-generated analysis is provided <strong style="color:rgba(255,255,255,.45)">FOR INFORMATIONAL AND EDUCATIONAL PURPOSES ONLY</strong> and does not constitute medical advice, diagnosis, or treatment recommendation.<br><br>
+   HEAL Peptides products are sold for <strong style="color:rgba(255,255,255,.45)">RESEARCH USE ONLY</strong>. Not for human consumption. Not evaluated by FDA/COFEPRIS.<br><br>
+   <strong style="color:rgba(255,255,255,.45)">ALWAYS consult with a licensed healthcare professional</strong> before starting, modifying, or discontinuing any protocol or treatment.
+  </div>
  </div>
 </div>
 
@@ -586,6 +631,68 @@ select option{background:#1a1a28}
   <div style="font-size:13px;font-weight:600;color:#3aa0ff;margin-bottom:6px">💬 Free protocol consultation</div>
   <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.6">Not sure what to order? WhatsApp us and we'll build your personalized protocol.</div>
   <button class="btn" style="margin-top:12px;font-size:13px" onclick="window.open('https://wa.me/50688970649','_blank')">WhatsApp us now</button>
+ </div>
+
+<!-- STACKS SECTION -->
+ <div class="card shop-section" id="stacks-section" data-cat="stacks" style="background:linear-gradient(135deg,#0d1f3c,#0f0f1a);border-color:#1a4a80">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+   <div class="ct" style="margin:0">⭐ Stacks</div>
+   <div style="font-size:10px;color:#3aa0ff;font-weight:600;background:rgba(26,111,196,.15);border:0.5px solid rgba(26,111,196,.35);border-radius:8px;padding:3px 8px">BUNDLE & SAVE</div>
+  </div>
+  
+  <!-- Runner Stack -->
+  <div class="stack-bundle-card" data-stack-code="RUNNER_STACK" data-stack-price="195" style="background:#0a1628;border:0.5px solid rgba(26,111,196,.3);border-radius:14px;padding:14px;margin-bottom:10px">
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <div>
+     <div style="font-size:14px;font-weight:700;color:#fff">🏃 Runner Stack</div>
+     <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Recovery & joint protection</div>
+    </div>
+    <div style="text-align:right">
+     <div style="font-size:18px;font-weight:700;color:#fff">$195</div>
+     <div style="font-size:10px;color:#5DCAA5;font-weight:600">Save $34</div>
+    </div>
+   </div>
+   <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:10px">
+    • BPC-157 10mg &nbsp;·&nbsp; TB-500 10mg<br>• GHK-Cu 50mg &nbsp;·&nbsp; Bac Water 10ml
+   </div>
+   <button class="padd stack-add-btn" onclick="stackAdd(this)" style="width:100%;text-align:center;padding:9px 0">+ Add Stack</button>
+  </div>
+
+  <!-- Gains Stack -->
+  <div class="stack-bundle-card" data-stack-code="GAINS_STACK" data-stack-price="165" style="background:#0a1628;border:0.5px solid rgba(26,111,196,.3);border-radius:14px;padding:14px;margin-bottom:10px">
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <div>
+     <div style="font-size:14px;font-weight:700;color:#fff">💪 Gains Stack</div>
+     <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Performance & hypertrophy</div>
+    </div>
+    <div style="text-align:right">
+     <div style="font-size:18px;font-weight:700;color:#fff">$165</div>
+     <div style="font-size:10px;color:#5DCAA5;font-weight:600">Save $29</div>
+    </div>
+   </div>
+   <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:10px">
+    • Ipamorelin/CJC-1295 10mg &nbsp;·&nbsp; BPC-157 10mg<br>• MOTS-C 10mg &nbsp;·&nbsp; Bac Water 10ml
+   </div>
+   <button class="padd stack-add-btn" onclick="stackAdd(this)" style="width:100%;text-align:center;padding:9px 0">+ Add Stack</button>
+  </div>
+
+  <!-- CEO Stack -->
+  <div class="stack-bundle-card" data-stack-code="CEO_STACK" data-stack-price="241" style="background:#0a1628;border:0.5px solid rgba(26,111,196,.3);border-radius:14px;padding:14px">
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <div>
+     <div style="font-size:14px;font-weight:700;color:#fff">🧠 CEO Stack</div>
+     <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Cognitive, energy & sleep</div>
+    </div>
+    <div style="text-align:right">
+     <div style="font-size:18px;font-weight:700;color:#fff">$241</div>
+     <div style="font-size:10px;color:#5DCAA5;font-weight:600">Save $6</div>
+    </div>
+   </div>
+   <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:10px">
+    • Semax 10mg &nbsp;·&nbsp; Selank 10mg<br>• NAD+ 500mg &nbsp;·&nbsp; DSIP 5mg &nbsp;·&nbsp; Bac Water 10ml
+   </div>
+   <button class="padd stack-add-btn" onclick="stackAdd(this)" style="width:100%;text-align:center;padding:9px 0">+ Add Stack</button>
+  </div>
  </div>
 
  <!-- Signature bundles -->
@@ -945,7 +1052,7 @@ function nav(id,btn){
  if(id==='track')renderTracker();
  if(id==='proto'){renderProto();renderCustomStack();}
  if(id==='admin')adminLoad();
- if(id==='labs')labsRender();
+ if(id==='labs') labsCheckConsent();
 }
 
 function switchMode(mode,btn){
@@ -1003,11 +1110,144 @@ function checkDose(i){
 
 function renderProto(){
  const g=GOALS[activeGoal];
- document.getElementById('stack-list').innerHTML=g.stack.map(s=>`<div class="stack-item" style="border-left-color:${s.color}"><div class="si-info"><div class="si-name">${s.name}${s.units?` <span style="background:rgba(26,111,196,.2);border:0.5px solid rgba(26,111,196,.5);border-radius:6px;padding:1px 7px;font-size:10px;font-weight:600;color:#3aa0ff">${s.units} units</span>`:''}</div><div class="si-dose">${s.dose} · ${s.freq}</div><div class="si-sched">${s.sched}</div></div></div>`).join('');
- document.getElementById('proto-sched').innerHTML=`<div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:7px">${g.stack[0].name} — ${g.stack[0].freq}</div><div class="day-g">${g.days.map((d,i)=>{const cl=g.patterns[i]==='done'?'d-done':g.patterns[i]==='today'?'d-today':g.patterns[i]==='sched'?'d-sched':'d-off';return `<div class="day ${cl}">${d}</div>`;}).join('')}</div>`;
+ const stackListEl=document.getElementById('stack-list');
+ const protoSchedEl=document.getElementById('proto-sched');
+ if(stackListEl) stackListEl.innerHTML=g.stack.map(s=>`<div class="stack-item" style="border-left-color:${s.color}"><div class="si-info"><div class="si-name">${s.name}${s.units?` <span style="background:rgba(26,111,196,.2);border:0.5px solid rgba(26,111,196,.5);border-radius:6px;padding:1px 7px;font-size:10px;font-weight:600;color:#3aa0ff">${s.units} units</span>`:''}</div><div class="si-dose">${s.dose} · ${s.freq}</div><div class="si-sched">${s.sched}</div></div></div>`).join('');
+ if(protoSchedEl) protoSchedEl.innerHTML=`<div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:7px">${g.stack[0].name} — ${g.stack[0].freq}</div><div class="day-g">${g.days.map((d,i)=>{const cl=g.patterns[i]==='done'?'d-done':g.patterns[i]==='today'?'d-today':g.patterns[i]==='sched'?'d-sched':'d-off';return `<div class="day ${cl}">${d}</div>`;}).join('')}</div>`;
+ if(typeof renderQuickStackRec === 'function') renderQuickStackRec(activeGoal);
 }
 
-function selectGoal(el,goal){document.querySelectorAll('.gcard').forEach(g=>g.classList.remove('sel'));el.classList.add('sel');activeGoal=goal;save();renderProto();}
+// Goal → Stack recommendation mapping
+const GOAL_STACK_MAP = {
+ recovery: {
+  stackCode: 'RUNNER_STACK',
+  durationWeeks: 6,
+  upsellMsg: null
+ },
+ performance: {
+  stackCode: 'GAINS_STACK',
+  durationWeeks: 8,
+  upsellMsg: null
+ },
+ longevity: {
+  stackCode: 'CEO_STACK',
+  durationWeeks: 12,
+  upsellMsg: 'Add Epithalon 10mg for a deep longevity protocol'
+ },
+ weight: {
+  stackCode: null,
+  recommendation: 'Tirzepatide 15mg',
+  addOn: 'Glow Blend 60mg (recovery support)',
+  addOnPrice: 185,
+  mainPrice: 75,
+  durationWeeks: 12,
+  upsellMsg: 'Pair with Glow Blend for recovery support during cycle'
+ }
+};
+
+function renderQuickStackRec(goal){
+ const rec = GOAL_STACK_MAP[goal];
+ if(!rec){ document.getElementById('quick-stack-rec').style.display='none'; return; }
+
+ const panel = document.getElementById('quick-stack-rec');
+ const content = document.getElementById('qsr-content');
+
+ if(rec.stackCode && window.STACKS && STACKS[rec.stackCode]){
+  const stack = STACKS[rec.stackCode];
+  const emojiMap = { RUNNER_STACK:'🏃', GAINS_STACK:'💪', CEO_STACK:'🧠' };
+  const saveMap = { RUNNER_STACK:34, GAINS_STACK:29, CEO_STACK:6 };
+  const emoji = emojiMap[rec.stackCode] || '📦';
+  const save = saveMap[rec.stackCode] || 0;
+
+  content.innerHTML = `
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+    <div>
+     <div style="font-size:15px;font-weight:700;color:#fff">${emoji} ${stack.name}</div>
+     <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">${rec.durationWeeks}-week protocol · pre-loaded</div>
+    </div>
+    <div style="text-align:right">
+     <div style="font-size:18px;font-weight:700;color:#fff">$${stack.price}</div>
+     ${save > 0 ? `<div style="font-size:10px;color:#5DCAA5;font-weight:600">Save $${save}</div>` : ''}
+    </div>
+   </div>
+   <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:4px">
+    ${stack.components.map(c=>'• '+c).join('<br>')}
+   </div>
+   ${rec.upsellMsg ? `<div style="font-size:11px;color:#3aa0ff;margin-top:8px;padding:8px;background:rgba(26,111,196,.1);border-radius:8px;border:0.5px solid rgba(26,111,196,.25)">💡 ${rec.upsellMsg}</div>` : ''}
+  `;
+  panel.dataset.currentStackCode = rec.stackCode;
+
+ } else if(goal === 'weight'){
+  content.innerHTML = `
+   <div style="margin-bottom:10px">
+    <div style="font-size:15px;font-weight:700;color:#fff">⚖️ Weight Loss Protocol</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">${rec.durationWeeks}-week protocol · pre-loaded</div>
+   </div>
+   <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:4px">
+    • ${rec.recommendation} — $${rec.mainPrice}<br>
+    • ${rec.addOn} — $${rec.addOnPrice}
+   </div>
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:8px 0;border-top:0.5px solid rgba(255,255,255,.07)">
+    <div style="font-size:12px;color:rgba(255,255,255,.5)">Bundle total</div>
+    <div style="font-size:16px;font-weight:700;color:#fff">$${rec.mainPrice + rec.addOnPrice}</div>
+   </div>
+   ${rec.upsellMsg ? `<div style="font-size:11px;color:#3aa0ff;margin-top:8px;padding:8px;background:rgba(26,111,196,.1);border-radius:8px;border:0.5px solid rgba(26,111,196,.25)">💡 ${rec.upsellMsg}</div>` : ''}
+  `;
+  panel.dataset.currentStackCode = 'WEIGHT_COMBO';
+ }
+
+ panel.style.display = 'block';
+ document.getElementById('quick-protocol-detail').style.display = 'none';
+}
+
+function quickStackOrder(){
+ const panel = document.getElementById('quick-stack-rec');
+ const code = panel.dataset.currentStackCode;
+
+ // 1. Activate the protocol
+ activateQuickProtocol();
+
+ // 2. Add stack to cart
+ if(code && code !== 'WEIGHT_COMBO' && window.STACKS && STACKS[code]){
+  const stack = STACKS[code];
+  const idx = _cart.findIndex(i => i.stackCode === code);
+  if(idx < 0){
+   _cart.push({ name: stack.name, price: stack.price, isStack: true, stackCode: code, components: stack.components });
+   cartRender();
+  }
+  document.querySelectorAll('.stack-bundle-card').forEach(card => {
+   if(card.dataset.stackCode === code){
+    const btn = card.querySelector('.stack-add-btn');
+    if(btn){ btn.textContent = '✓ Added'; btn.classList.add('in-cart'); }
+   }
+  });
+ } else if(code === 'WEIGHT_COMBO'){
+  if(!_cart.find(i=>i.name==='Tirzepatide 15mg')) _cart.push({name:'Tirzepatide 15mg',price:75});
+  if(!_cart.find(i=>i.name==='Glow Blend 60mg')) _cart.push({name:'Glow Blend 60mg',price:185});
+  cartRender();
+ }
+
+ // 3. Navigate to Shop with cart visible
+ const shopBtn = document.querySelector('.nt button[onclick*="shop"]');
+ if(shopBtn) nav('shop', shopBtn);
+
+ showToast('Protocol activated! Stack added to cart 🛒');
+}
+
+function quickStackCustomize(){
+ document.getElementById('quick-stack-rec').style.display = 'none';
+ document.getElementById('quick-protocol-detail').style.display = 'block';
+ renderProto();
+}
+
+function selectGoal(el,goal){
+ document.querySelectorAll('.gcard').forEach(g=>g.classList.remove('sel'));
+ el.classList.add('sel');
+ activeGoal=goal;
+ save();
+ renderProto();
+ renderQuickStackRec(goal);
+}
 
 function activateQuickProtocol(){
  const g=GOALS[activeGoal];
@@ -1443,6 +1683,31 @@ function doResendVerification(){
 // --- Cart ---
 let _cart=[];
 
+// Stack data (components for WhatsApp message)
+const STACKS = {
+ RUNNER_STACK: { name: 'Runner Stack', price: 195, components: ['BPC-157 10mg', 'TB-500 10mg', 'GHK-Cu 50mg', 'Bac Water 10ml'] },
+ GAINS_STACK:  { name: 'Gains Stack',  price: 165, components: ['Ipamorelin/CJC-1295 10mg', 'BPC-157 10mg', 'MOTS-C 10mg', 'Bac Water 10ml'] },
+ CEO_STACK:    { name: 'CEO Stack',    price: 241, components: ['Semax 10mg', 'Selank 10mg', 'NAD+ 500mg', 'DSIP 5mg', 'Bac Water 10ml'] }
+};
+
+function stackAdd(btn){
+ const card = btn.closest('.stack-bundle-card');
+ const code = card.dataset.stackCode;
+ const stack = STACKS[code];
+ if(!stack) return;
+ const idx = _cart.findIndex(i => i.stackCode === code);
+ if(idx >= 0){
+  _cart.splice(idx, 1);
+  btn.textContent = '+ Add Stack';
+  btn.classList.remove('in-cart');
+ } else {
+  _cart.push({ name: stack.name, price: stack.price, isStack: true, stackCode: code, components: stack.components });
+  btn.textContent = '✓ Added';
+  btn.classList.add('in-cart');
+ }
+ cartRender();
+}
+
 function orderWA(btn){
  const row=btn.closest('.prod-row');
  const name=row?row.querySelector('.pname').textContent.trim():'';
@@ -1476,13 +1741,22 @@ function cartRender(){
 
 function cartClear(){
  _cart=[];
- document.querySelectorAll('.padd.in-cart').forEach(b=>{b.textContent='+ Add';b.classList.remove('in-cart');});
+ document.querySelectorAll('.padd.in-cart').forEach(b=>{
+  b.textContent=b.classList.contains('stack-add-btn')?'+ Add Stack':'+ Add';
+  b.classList.remove('in-cart');
+ });
  cartRender();
 }
 
 function cartOrderWA(){
  if(!_cart.length)return;
- const lines=_cart.map(i=>'- '+i.name+(i.price?' ($'+i.price+')':'')).join('%0A');
+ const lines=_cart.map(i=>{
+  let line = '- ' + i.name + ' ($' + i.price + ')';
+  if(i.isStack && i.components){
+   line += '%0A  (' + i.components.join(', ') + ')';
+  }
+  return line;
+ }).join('%0A');
  const total=_cart.reduce((a,i)=>a+i.price,0).toFixed(0);
  const msg='Hola%2C+quiero+ordenar+los+siguientes+productos%3A%0A'+lines+'%0A%0ATotal%3A+%24'+total+'%0A%C2%BFCu%C3%A1ndo+est%C3%A1n+disponibles%3F';
  window.open('https://wa.me/50688970649?text='+msg,'_blank');
@@ -1832,6 +2106,60 @@ nav=function(id,btn){
 load();calcFromMcg();renderHome();renderProto();renderCustomStack();renderTracker();
 
 // ============================================
+// LABS — Consent + Legal
+// ============================================
+function labsConsentKey(){
+ return (window._storagePrefix||'heal-') + 'labs-consent';
+}
+
+function labsHasConsent(){
+ try{
+  const c = JSON.parse(localStorage.getItem(labsConsentKey()));
+  return !!(c && c.agreed);
+ }catch(e){ return false; }
+}
+
+function labsCheckConsent(){
+ if(labsHasConsent()){
+  labsRender();
+ } else {
+  const overlay = document.getElementById('labs-consent-overlay');
+  overlay.style.display = 'flex';
+ }
+}
+
+function labsConsentAgree(){
+ const consentData = { agreed: true, agreedAt: new Date().toISOString() };
+ localStorage.setItem(labsConsentKey(), JSON.stringify(consentData));
+
+ if(window.SUPABASE_URL && window.SUPABASE_KEY && currentUser){
+  try{
+   fetch(SUPABASE_URL + '/rest/v1/user_consents', {
+    method: 'POST',
+    headers: {
+     'apikey': SUPABASE_KEY,
+     'Authorization': 'Bearer ' + SUPABASE_KEY,
+     'Content-Type': 'application/json',
+     'Prefer': 'resolution=merge-duplicates'
+    },
+    body: JSON.stringify({
+     user_id: currentUser.id,
+     consent_type: 'labs_disclaimer_v1',
+     agreed_at: consentData.agreedAt
+    })
+   });
+  }catch(e){ /* non-blocking */ }
+ }
+
+ document.getElementById('labs-consent-overlay').style.display = 'none';
+ labsRender();
+}
+
+function labsConsentCancel(){
+ document.getElementById('labs-consent-overlay').style.display = 'none';
+ nav('home', document.querySelector('.nt button'));
+}
+
 // LABS — Blood Test Analyzer
 // ============================================
 let _labsFile = null;
@@ -1861,9 +2189,13 @@ function labsFileSelected(input){
 async function labsAnalyze(){
  if(!_labsFile){ alert('Please select a file first.'); return; }
 
- // Get previous results for comparison
+ // Get previous results for comparison (only essential fields to keep request small)
  const stored = labsGetStored();
- const previous = stored.length > 0 ? stored[stored.length-1] : null;
+ const lastStored = stored.length > 0 ? stored[stored.length-1] : null;
+ const previous = lastStored ? {
+  date: lastStored.date || lastStored.savedAt?.split('T')[0] || null,
+  markers: (lastStored.markers || []).map(m => ({ name: m.name, value: m.value, unit: m.unit, status: m.status }))
+ } : null;
 
  // Show loading
  document.getElementById('labs-loading').style.display='block';
@@ -1882,7 +2214,7 @@ async function labsAnalyze(){
 
   const body = JSON.stringify({
    imageBase64: base64,
-   mediaType: _labsFileType.startsWith('application/pdf') ? 'image/jpeg' : _labsFileType,
+   mediaType: _labsFileType || 'image/jpeg',
    previousResults: previous
   });
 

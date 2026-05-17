@@ -14,9 +14,17 @@ exports.handler = async (event) => {
 
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-    const systemPrompt = `You are a medical lab results analyzer for HEAL Peptides research clients.
-Extract biomarkers from blood test images/PDFs and return structured JSON.
-Always respond ONLY with valid JSON, no markdown, no explanation.`;
+    const systemPrompt = `You are a blood test biomarker extractor for HEAL Peptides.
+Your job is to extract and categorize lab markers from blood test images or PDFs.
+Return structured JSON only — no markdown, no explanation outside the JSON.
+
+CRITICAL RULES — follow strictly:
+1. NEVER mention specific peptide names (e.g. Tirzepatide, BPC-157, Semaglutide, GHK-Cu, Epitalon, NAD+, etc.)
+2. NEVER suggest a specific compound, supplement, or treatment for any marker.
+3. ONLY use general research category labels (e.g. "metabolic regulation", "GH-axis support", "cellular energy", "longevity compounds").
+4. The "summary" field must ALWAYS end with: "Discuss these results with your healthcare provider before making any protocol changes."
+5. If a marker is out of range, describe it objectively — do NOT imply a cause or cure.
+6. You are providing educational data extraction only, not medical advice.`;
 
     const userPrompt = previousResults
       ? `Analyze this blood test and compare with the previous results below.
@@ -39,10 +47,11 @@ Return JSON in this exact format:
       "previousValue": 110.5,
       "change": -15.3,
       "changePct": -13.9,
-      "trend": "improved|worsened|stable"
+      "trend": "improved|worsened|stable",
+      "researchCategory": "general research category if out of range, or null if normal"
     }
   ],
-  "summary": "2-3 sentence AI summary of overall health trend and what changed"
+  "summary": "2-3 sentence objective summary of overall health trend and what changed. End with: Discuss these results with your healthcare provider before making any protocol changes."
 }`
       : `Extract all biomarkers from this blood test image.
 Return JSON in this exact format:
@@ -55,23 +64,27 @@ Return JSON in this exact format:
       "value": 95.2,
       "unit": "mg/dL", 
       "reference": "70-100",
-      "status": "normal|high|low"
+      "status": "normal|high|low",
+      "researchCategory": "general research category if out of range, or null if normal"
     }
   ],
-  "summary": "2-3 sentence summary of the overall results"
+  "summary": "2-3 sentence objective summary of the overall results. End with: Discuss these results with your healthcare provider before making any protocol changes."
 }`;
 
+    // PDFs use 'document' type; images use 'image' type
+    const isPdf = mediaType === 'application/pdf';
+    const contentBlock = isPdf
+      ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: imageBase64 } }
+      : { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } };
+
     const response = await client.messages.create({
-      model: 'claude-opus-4-5',
+      model: 'claude-haiku-4-5',
       max_tokens: 2000,
       system: systemPrompt,
       messages: [{
         role: 'user',
         content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: mediaType, data: imageBase64 }
-          },
+          contentBlock,
           { type: 'text', text: userPrompt }
         ]
       }]
