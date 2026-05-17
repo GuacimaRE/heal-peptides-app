@@ -770,6 +770,15 @@ select option{background:#1a1a28}
   <span class="cart-total">$<span id="cart-total-num">0</span></span>
  </div>
  <div class="cart-items-list" id="cart-items-list"></div>
+ <div id="promo-row" style="display:none;margin-bottom:8px">
+  <div style="display:flex;gap:6px">
+   <input id="promo-input" type="text" placeholder="Código promo" maxlength="20"
+    style="flex:1;background:#0a0a14;border:0.5px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;padding:9px 12px;font-size:12px;font-family:Inter,sans-serif;outline:none;text-transform:uppercase"
+    oninput="this.value=this.value.toUpperCase()">
+   <button onclick="applyPromo()" style="background:rgba(26,111,196,.25);border:0.5px solid rgba(26,111,196,.5);color:#3aa0ff;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Aplicar</button>
+  </div>
+  <div id="promo-msg" style="font-size:11px;margin-top:5px;padding-left:2px"></div>
+ </div>
  <div class="cart-actions">
   <button class="cart-clear" onclick="cartClear()">Clear</button>
   <button class="cart-order" id="cart-order-btn" onclick="cartOrderWA()">📲 Confirmar por WhatsApp</button>
@@ -1743,21 +1752,54 @@ function orderWA(btn){
  cartRender();
 }
 
+// Promo codes
+const PROMOS={
+ STACK10:{discount:0.10,appliesToStacks:true,requiresAccount:true,expiresAt:new Date('2026-05-24T23:59:59-06:00')}
+};
+let _activePromo=null;
+
+function applyPromo(){
+ const input=document.getElementById('promo-input');
+ const msg=document.getElementById('promo-msg');
+ const code=input?input.value.trim().toUpperCase():'';
+ if(!code)return;
+ const promo=PROMOS[code];
+ if(!promo){msg.style.color='#F09595';msg.textContent='❌ Código inválido';_activePromo=null;cartRender();return;}
+ if(new Date()>promo.expiresAt){msg.style.color='#F09595';msg.textContent='❌ Código vencido';_activePromo=null;cartRender();return;}
+ if(promo.requiresAccount&&!currentUser){msg.style.color='#F09595';msg.textContent='❌ Solo para clientes con cuenta';_activePromo=null;cartRender();return;}
+ const stackItems=_cart.filter(i=>i.isStack);
+ if(promo.appliesToStacks&&stackItems.length===0){msg.style.color='#F09595';msg.textContent='❌ Aplica solo a Stacks';_activePromo=null;cartRender();return;}
+ const discountAmount=Math.round(stackItems.reduce((a,i)=>a+i.price,0)*promo.discount);
+ _activePromo={code,discountAmount};
+ msg.style.color='#5DCAA5';msg.textContent='✅ '+code+' — -$'+discountAmount+' aplicado';
+ cartRender();
+}
+
 function cartRender(){
  const bar=document.getElementById('cart-bar');
  const countEl=document.getElementById('cart-count-num');
  const totalEl=document.getElementById('cart-total-num');
  const listEl=document.getElementById('cart-items-list');
+ const promoRow=document.getElementById('promo-row');
  if(!bar)return;
- if(_cart.length===0){bar.classList.remove('show');return;}
+ if(_cart.length===0){bar.classList.remove('show');_activePromo=null;return;}
  bar.classList.add('show');
+ if(promoRow)promoRow.style.display=_cart.some(i=>i.isStack)?'block':'none';
+ const subtotal=_cart.reduce((a,i)=>a+i.price,0);
+ const disc=_activePromo?_activePromo.discountAmount:0;
  countEl.textContent=_cart.length;
- totalEl.textContent=_cart.reduce((a,i)=>a+i.price,0).toFixed(0);
+ if(disc>0){
+  totalEl.innerHTML='<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:13px">$'+subtotal.toFixed(0)+'</span> <span style="color:#5DCAA5">$'+(subtotal-disc).toFixed(0)+'</span>';
+ }else{
+  totalEl.textContent=subtotal.toFixed(0);
+ }
  listEl.textContent=_cart.map(i=>i.name+(i.price?' ($'+i.price+')':'')).join(' · ');
 }
 
 function cartClear(){
- _cart=[];
+ _cart=[];_activePromo=null;
+ const pi=document.getElementById('promo-input');const pm=document.getElementById('promo-msg');
+ if(pi)pi.value='';if(pm)pm.textContent='';
  document.querySelectorAll('.padd.in-cart').forEach(b=>{
   b.textContent=b.classList.contains('stack-add-btn')?'+ Add Stack':'+ Add';
   b.classList.remove('in-cart');
@@ -1781,7 +1823,9 @@ function cartOrderWA(){
  const ts = String(Date.now()).slice(-4);
  const orderNumber = 'HEAL-' + year + '-' + ts + seq.slice(-2);
 
- const total = _cart.reduce((a,i)=>a+i.price,0);
+ const subtotal=_cart.reduce((a,i)=>a+i.price,0);
+ const disc=_activePromo?_activePromo.discountAmount:0;
+ const total=subtotal-disc;
 
  // 2. Build WhatsApp message synchronously
  const itemLines = _cart.map(i => {
@@ -1802,6 +1846,7 @@ function cartOrderWA(){
   'TOTAL: $' + total.toFixed(0) + '\n' +
   '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n' +
   'Quedo atento a la confirmaci\u00F3n de stock + datos de pago \uD83D\uDE4F\n\n' +
+  (_activePromo?'\uD83C\uDFF7\uFE0F Promo: '+_activePromo.code+' (-$'+_activePromo.discountAmount+')\n\n':'') +
   'Pedido desde la app HEAL \u00B7 ID: ' + orderNumber;
 
  // 3. Open WhatsApp IMMEDIATELY (must be synchronous in user-gesture context)
@@ -1832,6 +1877,8 @@ function cartOrderWA(){
    status: 'pending_whatsapp',
    total_amount: total,
    items: itemsJson,
+   promo_code: _activePromo?_activePromo.code:null,
+   discount_amount: disc||null,
    whatsapp_sent_at: new Date().toISOString()
   })
  }).catch(e => console.warn('Order save failed:', e));
