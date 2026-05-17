@@ -1772,98 +1772,71 @@ const STACK_SAVINGS = {
  CEO_STACK:    { savings: 43, emoji: '👔', shortComponents: ['Semax', 'Selank', 'NAD+', 'DSIP', 'Bac Water'] }
 };
 
-async function cartOrderWA(){
+function cartOrderWA(){
  if(!_cart.length)return;
- const btn = document.getElementById('cart-order-btn');
- if(btn){ btn.disabled=true; btn.textContent='⏳ Procesando...'; }
 
- // Build items JSON for DB
- const itemsJson = _cart.map(i => ({
-  name: i.name,
-  price: i.price,
-  isStack: !!i.isStack,
-  stackCode: i.stackCode || null,
-  components: i.components || null
- }));
+ // 1. Generate order number CLIENT-SIDE immediately (no async needed)
+ const year = new Date().getFullYear();
+ const seq = String(_orderSeq = (_orderSeq||0) + 1).padStart(4,'0');
+ const ts = String(Date.now()).slice(-4);
+ const orderNumber = 'HEAL-' + year + '-' + ts + seq.slice(-2);
+
  const total = _cart.reduce((a,i)=>a+i.price,0);
 
- // Generate order number + save to Supabase
- let orderNumber = 'HEAL-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000)+1000);
- try {
-  const year = new Date().getFullYear();
-  const countRes = await fetch(
-   SUPABASE_URL + "/rest/v1/orders?select=order_number&order_number=like.HEAL-" + year + "-%25&order=order_number.desc&limit=1",
-   { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
-  );
-  let nextNum = 1;
-  if(countRes.ok){
-   const rows = await countRes.json();
-   if(rows.length > 0){
-    const last = rows[0].order_number;
-    const parts = last.split('-');
-    nextNum = parseInt(parts[parts.length-1], 10) + 1;
-   }
+ // 2. Build WhatsApp message synchronously
+ const itemLines = _cart.map(i => {
+  if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
+   const meta = STACK_SAVINGS[i.stackCode];
+   return meta.emoji + ' ' + i.name + ' \u2014 $' + i.price + '\n' +
+    ' (' + meta.shortComponents.join(', ') + ')' + '\n' +
+    ' Ahorro: $' + meta.savings + ' vs individual';
+  } else {
+   return '- ' + i.name + ' \u2014 $' + i.price;
   }
-  orderNumber = 'HEAL-' + year + '-' + String(nextNum).padStart(4,'0');
+ }).join('\n\n');
 
-  const orderPayload = {
+ const msg =
+  'Hola HEAL \uD83D\uDC4B quiero ordenar:\n\n' +
+  itemLines + '\n\n' +
+  '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n' +
+  'TOTAL: $' + total.toFixed(0) + '\n' +
+  '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n' +
+  'Quedo atento a la confirmaci\u00F3n de stock + datos de pago \uD83D\uDE4F\n\n' +
+  'Pedido desde la app HEAL \u00B7 ID: ' + orderNumber;
+
+ // 3. Open WhatsApp IMMEDIATELY (must be synchronous in user-gesture context)
+ window.open('https://wa.me/50688970649?text=' + encodeURIComponent(msg), '_blank');
+
+ // 4. Show confirmation modal
+ const modal = document.getElementById('order-confirm-modal');
+ const numEl = document.getElementById('order-number-display');
+ if(modal && numEl){
+  numEl.textContent = orderNumber;
+  modal.style.display = 'flex';
+ }
+
+ // 5. Save to Supabase in background (non-blocking)
+ const itemsJson = _cart.map(i => ({
+  name: i.name, price: i.price,
+  isStack: !!i.isStack, stackCode: i.stackCode||null, components: i.components||null
+ }));
+ fetch(SUPABASE_URL + '/rest/v1/orders', {
+  method: 'POST',
+  headers: {
+   'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+   'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+  },
+  body: JSON.stringify({
    order_number: orderNumber,
    user_id: currentUser ? currentUser.id : null,
    status: 'pending_whatsapp',
    total_amount: total,
    items: itemsJson,
    whatsapp_sent_at: new Date().toISOString()
-  };
-  await fetch(SUPABASE_URL + '/rest/v1/orders', {
-   method: 'POST',
-   headers: {
-    'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=minimal'
-   },
-   body: JSON.stringify(orderPayload)
-  });
- } catch(e) {
-  console.warn('Order save failed (non-blocking):', e);
- }
-
- // Build WhatsApp message
- const itemLines = _cart.map(i => {
-  if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
-   const meta = STACK_SAVINGS[i.stackCode];
-   return meta.emoji + ' ' + i.name + ' — $' + i.price + '\n' +
-    ' (' + meta.shortComponents.join(', ') + ')' + '\n' +
-    ' Ahorro: $' + meta.savings + ' vs individual';
-  } else {
-   return '- ' + i.name + ' — $' + i.price;
-  }
- }).join('\n\n');
-
- const msg =
-  'Hola HEAL 👋 quiero ordenar:\n\n' +
-  itemLines + '\n\n' +
-  '━━━━━━━━━━━━━━━━━━━\n' +
-  'TOTAL: $' + total.toFixed(0) + '\n' +
-  '━━━━━━━━━━━━━━━━━━━\n\n' +
-  'Quedo atento a la confirmación de stock + datos de pago 🙏\n\n' +
-  'Pedido desde la app HEAL · ID: ' + orderNumber;
-
- // Show order confirmation modal BEFORE opening WA
- const modal = document.getElementById('order-confirm-modal');
- const numEl = document.getElementById('order-number-display');
- if(modal && numEl){
-  numEl.textContent = orderNumber;
-  modal.style.display = 'flex';
-  // Store pending WA url to open after modal
-  modal.dataset.waUrl = 'https://wa.me/50688970649?text=' + encodeURIComponent(msg);
- }
-
- if(btn){ btn.disabled=false; btn.textContent='📲 Confirmar por WhatsApp'; }
-
- // Open WhatsApp
- window.open('https://wa.me/50688970649?text=' + encodeURIComponent(msg), '_blank');
+  })
+ }).catch(e => console.warn('Order save failed:', e));
 }
+let _orderSeq = 0;
 
 function copyOrderNumber(){
  const num = document.getElementById('order-number-display');
