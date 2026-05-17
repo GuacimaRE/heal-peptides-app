@@ -1834,6 +1834,14 @@ async function loadB2bProfile(user) {
       }
     }
   } catch(e) { console.warn('B2B profile load failed:', e); }
+  // Clear any active promo — B2B pricing is exclusive, no stacking
+  if (_b2bDiscount > 0 && _activePromo) {
+    _activePromo = null;
+    const pi = document.getElementById('promo-input');
+    const pm = document.getElementById('promo-msg');
+    if (pi) pi.value = '';
+    if (pm) pm.textContent = '';
+  }
   applyB2bPricing();
   renderB2bBadge();
   renderDistributorWidget();
@@ -1865,8 +1873,16 @@ function applyB2bPricing() {
       if (!priceEl.getAttribute('data-orig')) priceEl.setAttribute('data-orig', origPrice);
       priceEl.innerHTML = '<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:13px">$'+origPrice+'</span><br><span style="color:#fff">$'+discPrice+'</span>';
     }
-    const savingsEl = card.querySelector('[style*="color:#5DCAA5"]');
-    if (savingsEl) savingsEl.textContent = badgeLabel;
+    // Hide bundle savings badge for B2B users (no double-discount display)
+    card.querySelectorAll('[style*="color:#5DCAA5"]').forEach(el => { el.style.display = 'none'; });
+    // Add B2B badge below price if not already present
+    if (!card.querySelector('.b2b-stack-badge')) {
+      const badgeEl = document.createElement('div');
+      badgeEl.className = 'b2b-stack-badge';
+      badgeEl.style.cssText = 'font-size:10px;color:'+badgeColor+';font-weight:700;margin-top:4px';
+      badgeEl.textContent = badgeLabel;
+      if (priceEl) priceEl.parentNode.insertBefore(badgeEl, priceEl.nextSibling);
+    }
   });
   cartRender();
 }
@@ -2031,7 +2047,7 @@ function cartOrderWA(){
     const meta = STACK_SAVINGS[i.stackCode];
     return meta.emoji + ' ' + i.name + ' \u2014 $' + i.price + '\n' +
      ' (' + meta.shortComponents.join(', ') + ')' + '\n' +
-     ' Ahorro: $' + meta.savings + ' vs individual';
+     (/* no bundle savings line for B2B — distributor price already includes their discount */ '');
    } else {
     return '- ' + i.name + ' \u2014 $' + i.price;
    }
