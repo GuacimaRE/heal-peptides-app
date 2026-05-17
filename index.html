@@ -1846,8 +1846,11 @@ function applyB2bPricing() {
   document.querySelectorAll('.prod-row').forEach(row => {
     const priceEl = row.querySelector('.pprice');
     if (!priceEl) return;
-    const orig = parseFloat(priceEl.getAttribute('data-orig') || priceEl.textContent.replace('$',''));
-    if (!priceEl.getAttribute('data-orig')) priceEl.setAttribute('data-orig', orig);
+    let orig = parseFloat(priceEl.getAttribute('data-orig'));
+    if (!orig) {
+      orig = parseFloat(priceEl.textContent.replace(/[^0-9.]/g,''));
+      priceEl.setAttribute('data-orig', orig);
+    }
     const disc = Math.round(orig * (1 - _b2bDiscount) * 100) / 100;
     priceEl.innerHTML = '<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:11px">$'+orig+'</span> <span style="color:#fff;font-weight:700">$'+disc+'</span> <span style="font-size:9px;color:'+badgeColor+';font-weight:700">'+badgeLabel+'</span>';
     const addBtn = row.querySelector('.padd');
@@ -1858,8 +1861,8 @@ function applyB2bPricing() {
     const discPrice = Math.round(origPrice * (1 - _b2bDiscount) * 100) / 100;
     card.setAttribute('data-b2b-price', discPrice);
     const priceEl = card.querySelector('[style*="font-size:18px"]');
-    if (priceEl && !priceEl.getAttribute('data-orig')) {
-      priceEl.setAttribute('data-orig', origPrice);
+    if (priceEl) {
+      if (!priceEl.getAttribute('data-orig')) priceEl.setAttribute('data-orig', origPrice);
       priceEl.innerHTML = '<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:13px">$'+origPrice+'</span><br><span style="color:#fff">$'+discPrice+'</span>';
     }
     const savingsEl = card.querySelector('[style*="color:#5DCAA5"]');
@@ -2787,6 +2790,9 @@ async function confirmB2bChange() {
       closeB2bModal();
       await adminLoadB2b();
       showToast('\u2705 Cuenta actualizada \u2014 email enviado');
+      if (currentUser && _b2bModalTarget && currentUser.email === _b2bModalTarget.email) {
+        await loadB2bProfile(currentUser);
+      }
     } else {
       showToast('\u274C Error: ' + (data.error || 'unknown'));
     }
