@@ -600,7 +600,12 @@ select option{background:#1a1a28}
     <button class="btn-sm" onclick="adminLoadB2b()">&#x21BB;</button>
    </div>
   </div>
-  <div id="b2b-users-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">Loading...</div>
+  <div id="b2b-users-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">
+   <div style="padding:10px;background:#0a1628;border-radius:10px;font-size:11px;color:rgba(255,255,255,.4);line-height:1.6">
+    ℹ️ Los usuarios aparecen aquí cuando inician sesión en la app por primera vez.<br>
+    Podés marcarlos como Distribuidor o Clínica usando los botones de cada usuario.
+   </div>
+  </div>
  </div>
 
  <!-- B2B Change Type Modal -->
@@ -1797,6 +1802,16 @@ async function loadB2bProfile(user) {
       full_name: user.user_metadata?.full_name || user.email.split('@')[0],
       updated_at: new Date().toISOString()
     };
+    // Also update user_id via PATCH in case the row exists with a placeholder user_id
+    await fetch(SUPABASE_URL + '/rest/v1/heal_accounts?email=eq.' + encodeURIComponent(user.email), {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ user_id: user.id, full_name: user.user_metadata?.full_name || user.email.split('@')[0], updated_at: new Date().toISOString() })
+    }).catch(() => {});
     await fetch(SUPABASE_URL + '/rest/v1/heal_accounts', {
       method: 'POST',
       headers: {
@@ -2698,7 +2713,7 @@ function adminB2bFilter(type) {
 function renderB2bUserList(users) {
   const el = document.getElementById('b2b-users-list');
   if (!el) return;
-  if (!users.length) { el.innerHTML = '<span style="color:rgba(255,255,255,.3)">Sin usuarios en este filtro.</span>'; return; }
+  if (!users.length) { el.innerHTML = '<div style="padding:12px;text-align:center;color:rgba(255,255,255,.35);font-size:12px">Sin usuarios en este filtro.<br><span style="font-size:11px;color:rgba(255,255,255,.2)">Los usuarios aparecen aquí la primera vez que inician sesión en la app.</span></div>'; return; }
   el.innerHTML = users.map(u => {
     const typeBadge = u.account_type === 'distributor' ? '<span style="color:#f5c518;font-size:10px;font-weight:700">\uD83D\uDC51 DISTRIBUIDOR</span>' :
       u.account_type === 'clinic' ? '<span style="color:#4fc3f7;font-size:10px;font-weight:700">\uD83C\uDFE5 CL\u00CDNICA</span>' :
