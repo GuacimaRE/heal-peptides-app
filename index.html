@@ -772,7 +772,24 @@ select option{background:#1a1a28}
  <div class="cart-items-list" id="cart-items-list"></div>
  <div class="cart-actions">
   <button class="cart-clear" onclick="cartClear()">Clear</button>
-  <button class="cart-order" onclick="cartOrderWA()">📲 Order via WhatsApp</button>
+  <button class="cart-order" id="cart-order-btn" onclick="cartOrderWA()">📲 Confirmar por WhatsApp</button>
+ </div>
+</div>
+
+<!-- ORDER CONFIRMATION MODAL -->
+<div class="modal-overlay" id="order-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;align-items:center;justify-content:center;padding:24px">
+ <div style="background:#0d1f3c;border:1px solid #1a4a80;border-radius:20px;padding:28px 24px;max-width:360px;width:100%;text-align:center">
+  <div style="font-size:32px;margin-bottom:8px">✅</div>
+  <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Tu pedido fue enviado</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:20px">Número de pedido:</div>
+  <div style="background:#0a0a14;border:1.5px solid #1a6fc4;border-radius:12px;padding:14px 20px;margin-bottom:8px">
+   <div id="order-number-display" style="font-size:20px;font-weight:800;color:#3aa0ff;letter-spacing:1.5px;font-family:monospace">HEAL-2026-0001</div>
+  </div>
+  <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:20px">Guardalo para tu referencia</div>
+  <div style="display:flex;gap:10px">
+   <button onclick="copyOrderNumber()" style="flex:1;background:rgba(26,111,196,.2);border:0.5px solid rgba(26,111,196,.5);color:#3aa0ff;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">📋 Copiar número</button>
+   <button onclick="closeOrderModal()" style="flex:1;background:#25D366;border:none;color:#fff;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">✓ Listo</button>
+  </div>
  </div>
 </div>
 
@@ -1748,18 +1765,129 @@ function cartClear(){
  cartRender();
 }
 
-function cartOrderWA(){
+// Stack savings (pre-calculated per ticket #4)
+const STACK_SAVINGS = {
+ RUNNER_STACK: { savings: 34, emoji: '🏃', shortComponents: ['BPC-157', 'TB-500', 'GHK-Cu', 'Bac Water'] },
+ GAINS_STACK:  { savings: 29, emoji: '💪', shortComponents: ['Ipa+CJC-1295', 'BPC-157', 'MOTS-C', 'Bac Water'] },
+ CEO_STACK:    { savings: 43, emoji: '👔', shortComponents: ['Semax', 'Selank', 'NAD+', 'DSIP', 'Bac Water'] }
+};
+
+async function cartOrderWA(){
  if(!_cart.length)return;
- const lines=_cart.map(i=>{
-  let line = '- ' + i.name + ' ($' + i.price + ')';
-  if(i.isStack && i.components){
-   line += '%0A  (' + i.components.join(', ') + ')';
+ const btn = document.getElementById('cart-order-btn');
+ if(btn){ btn.disabled=true; btn.textContent='⏳ Procesando...'; }
+
+ // Build items JSON for DB
+ const itemsJson = _cart.map(i => ({
+  name: i.name,
+  price: i.price,
+  isStack: !!i.isStack,
+  stackCode: i.stackCode || null,
+  components: i.components || null
+ }));
+ const total = _cart.reduce((a,i)=>a+i.price,0);
+
+ // Generate order number + save to Supabase
+ let orderNumber = 'HEAL-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000)+1000);
+ try {
+  const year = new Date().getFullYear();
+  const countRes = await fetch(
+   SUPABASE_URL + "/rest/v1/orders?select=order_number&order_number=like.HEAL-" + year + "-%25&order=order_number.desc&limit=1",
+   { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+  );
+  let nextNum = 1;
+  if(countRes.ok){
+   const rows = await countRes.json();
+   if(rows.length > 0){
+    const last = rows[0].order_number;
+    const parts = last.split('-');
+    nextNum = parseInt(parts[parts.length-1], 10) + 1;
+   }
   }
-  return line;
- }).join('%0A');
- const total=_cart.reduce((a,i)=>a+i.price,0).toFixed(0);
- const msg='Hola%2C+quiero+ordenar+los+siguientes+productos%3A%0A'+lines+'%0A%0ATotal%3A+%24'+total+'%0A%C2%BFCu%C3%A1ndo+est%C3%A1n+disponibles%3F';
- window.open('https://wa.me/50688970649?text='+msg,'_blank');
+  orderNumber = 'HEAL-' + year + '-' + String(nextNum).padStart(4,'0');
+
+  const orderPayload = {
+   order_number: orderNumber,
+   user_id: currentUser ? currentUser.id : null,
+   status: 'pending_whatsapp',
+   total_amount: total,
+   items: itemsJson,
+   whatsapp_sent_at: new Date().toISOString()
+  };
+  await fetch(SUPABASE_URL + '/rest/v1/orders', {
+   method: 'POST',
+   headers: {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+   },
+   body: JSON.stringify(orderPayload)
+  });
+ } catch(e) {
+  console.warn('Order save failed (non-blocking):', e);
+ }
+
+ // Build WhatsApp message
+ const itemLines = _cart.map(i => {
+  if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
+   const meta = STACK_SAVINGS[i.stackCode];
+   return meta.emoji + ' ' + i.name + ' — $' + i.price + '\n' +
+    ' (' + meta.shortComponents.join(', ') + ')' + '\n' +
+    ' Ahorro: $' + meta.savings + ' vs individual';
+  } else {
+   return '- ' + i.name + ' — $' + i.price;
+  }
+ }).join('\n\n');
+
+ const msg =
+  'Hola HEAL 👋 quiero ordenar:\n\n' +
+  itemLines + '\n\n' +
+  '━━━━━━━━━━━━━━━━━━━\n' +
+  'TOTAL: $' + total.toFixed(0) + '\n' +
+  '━━━━━━━━━━━━━━━━━━━\n\n' +
+  'Quedo atento a la confirmación de stock + datos de pago 🙏\n\n' +
+  'Pedido desde la app HEAL · ID: ' + orderNumber;
+
+ // Show order confirmation modal BEFORE opening WA
+ const modal = document.getElementById('order-confirm-modal');
+ const numEl = document.getElementById('order-number-display');
+ if(modal && numEl){
+  numEl.textContent = orderNumber;
+  modal.style.display = 'flex';
+  // Store pending WA url to open after modal
+  modal.dataset.waUrl = 'https://wa.me/50688970649?text=' + encodeURIComponent(msg);
+ }
+
+ if(btn){ btn.disabled=false; btn.textContent='📲 Confirmar por WhatsApp'; }
+
+ // Open WhatsApp
+ window.open('https://wa.me/50688970649?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function copyOrderNumber(){
+ const num = document.getElementById('order-number-display');
+ if(num && navigator.clipboard){
+  navigator.clipboard.writeText(num.textContent).then(()=>{
+   const btn = num.parentElement.parentElement.querySelector('button');
+   if(btn){ const orig=btn.textContent; btn.textContent='✓ Copiado!'; setTimeout(()=>btn.textContent=orig,2000); }
+  });
+ } else if(num){
+  // fallback
+  const ta = document.createElement('textarea');
+  ta.value = num.textContent;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+ }
+}
+
+function closeOrderModal(){
+ const modal = document.getElementById('order-confirm-modal');
+ if(modal) modal.style.display = 'none';
+ cartClear();
+ nav('home');
 }
 
 // --- Daily reminder (browser notifications) ---
