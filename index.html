@@ -589,6 +589,36 @@ select option{background:#1a1a28}
   <div id="admin-users-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">Loading...</div>
  </div>
 
+ <!-- B2B User Management -->
+ <div class="card" id="b2b-mgmt-card">
+  <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+   <span>&#x1F451; Gesti&#xF3;n B2B</span>
+   <div style="display:flex;gap:6px">
+    <button class="btn-sm" id="b2b-filter-all" onclick="adminB2bFilter('all')" style="background:rgba(26,111,196,.4)">Todos</button>
+    <button class="btn-sm" id="b2b-filter-distributor" onclick="adminB2bFilter('distributor')">Dist</button>
+    <button class="btn-sm" id="b2b-filter-clinic" onclick="adminB2bFilter('clinic')">Cl&#xED;nica</button>
+    <button class="btn-sm" onclick="adminLoadB2b()">&#x21BB;</button>
+   </div>
+  </div>
+  <div id="b2b-users-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">Loading...</div>
+ </div>
+
+ <!-- B2B Change Type Modal -->
+ <div id="b2b-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;align-items:center;justify-content:center;padding:24px">
+  <div style="background:#0d1f3c;border:1px solid #1a4a80;border-radius:20px;padding:24px;max-width:360px;width:100%">
+   <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px" id="b2b-modal-title">Cambiar tipo de cuenta</div>
+   <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:16px" id="b2b-modal-user"></div>
+   <div style="margin-bottom:12px">
+    <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px">Notas internas (opcional):</div>
+    <textarea id="b2b-modal-notes" rows="3" style="width:100%;background:#0a0a14;border:0.5px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;padding:10px;font-size:12px;font-family:Inter,sans-serif;outline:none;resize:none"></textarea>
+   </div>
+   <div style="display:flex;gap:10px">
+    <button onclick="closeB2bModal()" style="flex:1;background:rgba(255,255,255,.08);border:0.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:10px;padding:11px;font-size:13px;cursor:pointer;font-family:Inter,sans-serif">Cancelar</button>
+    <button id="b2b-modal-confirm" style="flex:1;background:#1a6fc4;border:none;color:#fff;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Confirmar</button>
+   </div>
+  </div>
+ </div>
+
  <!-- Dose activity -->
  <div class="card">
   <div class="ct">📊 Recent Dose Activity (last 7 days)</div>
@@ -1238,7 +1268,8 @@ function quickStackOrder(){
   const stack = STACKS[code];
   const idx = _cart.findIndex(i => i.stackCode === code);
   if(idx < 0){
-   _cart.push({ name: stack.name, price: stack.price, isStack: true, stackCode: code, components: stack.components });
+    const b2bStackPrice = parseFloat(card.getAttribute('data-b2b-price'));
+  _cart.push({ name: stack.name, price: (_b2bDiscount > 0 && b2bStackPrice) ? b2bStackPrice : stack.price, origPrice: stack.price, isStack: true, stackCode: code, components: stack.components });
    cartRender();
   }
   document.querySelectorAll('.stack-bundle-card').forEach(card => {
@@ -1526,6 +1557,7 @@ function doLogout(){
 
 function showApp(user){
  currentUser=user;
+ loadB2bProfile(user);
  const uid=user.id||user.email||'guest';
  window._storagePrefix='heal-'+uid+'-';
  // Hide auth, show app
@@ -1708,6 +1740,8 @@ function doResendVerification(){
 
 // --- Cart ---
 let _cart=[];
+let _b2bType = 'retail'; // 'retail' | 'distributor' | 'clinic'
+let _b2bDiscount = 0;    // 0.25 for distributor, 0.20 for clinic
 
 // Stack data (components for WhatsApp message)
 const STACKS = {
@@ -1745,11 +1779,129 @@ function orderWA(btn){
   btn.textContent='+ Add';
   btn.classList.remove('in-cart');
  }else{
-  _cart.push({name,price});
+   const b2bPrice = parseFloat(btn.getAttribute('data-b2b-price'));
+  _cart.push({name, price: (_b2bDiscount > 0 && b2bPrice) ? b2bPrice : price, origPrice: price});
   btn.textContent='✓ Added';
   btn.classList.add('in-cart');
  }
  cartRender();
+}
+
+
+// B2B Profile
+async function loadB2bProfile(user) {
+  try {
+    const upsertData = {
+      email: user.email,
+      user_id: user.id,
+      full_name: user.user_metadata?.full_name || user.email.split('@')[0],
+      updated_at: new Date().toISOString()
+    };
+    await fetch(SUPABASE_URL + '/rest/v1/heal_accounts', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify(upsertData)
+    });
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/heal_accounts?email=eq.' + encodeURIComponent(user.email) + '&select=account_type,is_admin',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows.length > 0) {
+        _b2bType = rows[0].account_type || 'retail';
+        _b2bDiscount = _b2bType === 'distributor' ? 0.25 : _b2bType === 'clinic' ? 0.20 : 0;
+      }
+    }
+  } catch(e) { console.warn('B2B profile load failed:', e); }
+  applyB2bPricing();
+  renderB2bBadge();
+  renderDistributorWidget();
+}
+
+function applyB2bPricing() {
+  if (_b2bDiscount === 0) return;
+  const badgeLabel = _b2bType === 'distributor' ? '\uD83D\uDC51 DIST -25%' : '\uD83C\uDFE5 CL\u00CDNICA -20%';
+  const badgeColor = _b2bType === 'distributor' ? '#f5c518' : '#4fc3f7';
+  document.querySelectorAll('.prod-row').forEach(row => {
+    const priceEl = row.querySelector('.pprice');
+    if (!priceEl) return;
+    const orig = parseFloat(priceEl.getAttribute('data-orig') || priceEl.textContent.replace('$',''));
+    if (!priceEl.getAttribute('data-orig')) priceEl.setAttribute('data-orig', orig);
+    const disc = Math.round(orig * (1 - _b2bDiscount) * 100) / 100;
+    priceEl.innerHTML = '<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:11px">$'+orig+'</span> <span style="color:#fff;font-weight:700">$'+disc+'</span> <span style="font-size:9px;color:'+badgeColor+';font-weight:700">'+badgeLabel+'</span>';
+    const addBtn = row.querySelector('.padd');
+    if (addBtn) addBtn.setAttribute('data-b2b-price', disc);
+  });
+  document.querySelectorAll('.stack-bundle-card').forEach(card => {
+    const origPrice = parseFloat(card.getAttribute('data-stack-price'));
+    const discPrice = Math.round(origPrice * (1 - _b2bDiscount) * 100) / 100;
+    card.setAttribute('data-b2b-price', discPrice);
+    const priceEl = card.querySelector('[style*="font-size:18px"]');
+    if (priceEl && !priceEl.getAttribute('data-orig')) {
+      priceEl.setAttribute('data-orig', origPrice);
+      priceEl.innerHTML = '<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:13px">$'+origPrice+'</span><br><span style="color:#fff">$'+discPrice+'</span>';
+    }
+    const savingsEl = card.querySelector('[style*="color:#5DCAA5"]');
+    if (savingsEl) savingsEl.textContent = badgeLabel;
+  });
+  cartRender();
+}
+
+function renderB2bBadge() {
+  if (_b2bType === 'retail') return;
+  const heroEl = document.querySelector('#pg-home .hero');
+  if (!heroEl || document.getElementById('b2b-badge')) return;
+  const badge = document.createElement('div');
+  badge.id = 'b2b-badge';
+  const isDistributor = _b2bType === 'distributor';
+  badge.style.cssText = 'background:' + (isDistributor ? 'rgba(245,197,24,.12)' : 'rgba(79,195,247,.12)') + ';border:0.5px solid ' + (isDistributor ? 'rgba(245,197,24,.4)' : 'rgba(79,195,247,.4)') + ';border-radius:10px;padding:8px 14px;margin-bottom:12px;text-align:center;font-size:12px;font-weight:700;color:' + (isDistributor ? '#f5c518' : '#4fc3f7');
+  badge.textContent = isDistributor ? '\uD83D\uDC51 ACCESO DISTRIBUIDOR \u00B7 25% OFF en todo el cat\u00E1logo' : '\uD83C\uDFE5 ACCESO CL\u00CDNICA B2B \u00B7 20% OFF en todo el cat\u00E1logo';
+  heroEl.parentNode.insertBefore(badge, heroEl.nextSibling);
+}
+
+async function renderDistributorWidget() {
+  if (_b2bType !== 'distributor') return;
+  const heroEl = document.querySelector('#pg-home .hero');
+  if (!heroEl || document.getElementById('dist-widget')) return;
+  const widget = document.createElement('div');
+  widget.id = 'dist-widget';
+  widget.style.cssText = 'background:linear-gradient(135deg,#1a0f00,#0f0f1a);border:0.5px solid rgba(245,197,24,.3);border-radius:14px;padding:16px;margin-bottom:12px';
+  widget.innerHTML = '<div style="font-size:12px;font-weight:700;color:#f5c518;margin-bottom:10px">\uD83D\uDC51 DISTRIBUIDOR HEAL</div><div style="font-size:11px;color:rgba(255,255,255,.4)">Calculando compras del mes...</div>';
+  const badge = document.getElementById('b2b-badge');
+  const insertAfter = badge || heroEl;
+  insertAfter.parentNode.insertBefore(widget, insertAfter.nextSibling);
+  try {
+    const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/orders?user_id=eq.' + encodeURIComponent(currentUser.id) + '&created_at=gte.' + monthStart.toISOString() + '&status=neq.cancelled&select=total_amount',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    const orders = res.ok ? await res.json() : [];
+    const spent = orders.reduce((a, o) => a + (parseFloat(o.total_amount) || 0), 0);
+    const min = 4000;
+    const pct = Math.min(100, Math.round(spent / min * 100));
+    const filled = Math.round(pct / 5);
+    const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(20 - filled);
+    if (spent >= min) {
+      widget.innerHTML = '<div style="font-size:12px;font-weight:700;color:#f5c518;margin-bottom:8px">\uD83D\uDC51 DISTRIBUIDOR HEAL</div>' +
+        '<div style="font-size:12px;color:#5DCAA5;font-weight:600;margin-bottom:4px">\u2705 M\u00EDnimo cumplido \u2014 $' + spent.toFixed(0) + ' / $4,000</div>' +
+        '<div style="font-size:11px;color:rgba(255,255,255,.4)">Acceso confirmado para el pr\u00F3ximo mes</div>';
+    } else {
+      const remaining = (min - spent).toFixed(0);
+      widget.innerHTML = '<div style="font-size:12px;font-weight:700;color:#f5c518;margin-bottom:8px">\uD83D\uDC51 DISTRIBUIDOR HEAL</div>' +
+        '<div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.6);margin-bottom:4px"><span>Compra mensual</span><span>$' + spent.toFixed(0) + ' / $4,000</span></div>' +
+        '<div style="font-family:monospace;font-size:11px;color:#f5c518;letter-spacing:1px;margin-bottom:6px">' + bar + ' ' + pct + '%</div>' +
+        '<div style="font-size:11px;color:rgba(255,255,255,.45)">Faltan <strong style="color:#fff">$' + remaining + '</strong> para mantener tu 25% off el pr\u00F3ximo mes.</div>';
+    }
+  } catch(e) {
+    widget.innerHTML = '<div style="font-size:12px;font-weight:700;color:#f5c518">\uD83D\uDC51 DISTRIBUIDOR HEAL \u00B7 25% OFF activo</div>';
+  }
 }
 
 // Promo codes
@@ -1763,6 +1915,7 @@ function applyPromo(){
  const msg=document.getElementById('promo-msg');
  const code=input?input.value.trim().toUpperCase():'';
  if(!code)return;
+ if (_b2bDiscount > 0) { msg.style.color='#f5c518'; msg.textContent='\uD83D\uDC51 Ya ten\u00E9s precios B2B aplicados \u2014 no se combina con c\u00F3digos promo'; return; }
  const promo=PROMOS[code];
  if(!promo){msg.style.color='#F09595';msg.textContent='❌ Código inválido';_activePromo=null;cartRender();return;}
  if(new Date()>promo.expiresAt){msg.style.color='#F09595';msg.textContent='❌ Código vencido';_activePromo=null;cartRender();return;}
@@ -1828,26 +1981,53 @@ function cartOrderWA(){
  const total=subtotal-disc;
 
  // 2. Build WhatsApp message synchronously
- const itemLines = _cart.map(i => {
-  if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
-   const meta = STACK_SAVINGS[i.stackCode];
-   return meta.emoji + ' ' + i.name + ' \u2014 $' + i.price + '\n' +
-    ' (' + meta.shortComponents.join(', ') + ')' + '\n' +
-    ' Ahorro: $' + meta.savings + ' vs individual';
-  } else {
-   return '- ' + i.name + ' \u2014 $' + i.price;
-  }
- }).join('\n\n');
-
- const msg =
-  'Hola HEAL \uD83D\uDC4B quiero ordenar:\n\n' +
-  itemLines + '\n\n' +
-  '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n' +
-  'TOTAL: $' + total.toFixed(0) + '\n' +
-  '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n' +
-  'Quedo atento a la confirmaci\u00F3n de stock + datos de pago \uD83D\uDE4F\n\n' +
-  (_activePromo?'\uD83C\uDFF7\uFE0F Promo: '+_activePromo.code+' (-$'+_activePromo.discountAmount+')\n\n':'') +
-  'Pedido desde la app HEAL \u00B7 ID: ' + orderNumber;
+ let msg;
+ if (_b2bDiscount > 0) {
+  const b2bLabel = _b2bType === 'distributor' ? 'DISTRIBUIDOR' : 'CL\u00CDNICA';
+  const discPct = _b2bType === 'distributor' ? '25%' : '20%';
+  const retailTotal = _cart.reduce((a,i) => a + (i.origPrice || i.price), 0);
+  const discountTotal = retailTotal - total;
+  const itemLines = _cart.map(i => {
+   const retail = i.origPrice || i.price;
+   if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
+    const meta = STACK_SAVINGS[i.stackCode];
+    return meta.emoji + ' ' + i.name + ' \u2014 ~~$' + retail + '~~ *$' + i.price + '*\n' +
+     ' (' + meta.shortComponents.join(', ') + ')';
+   } else {
+    return '- ' + i.name + ' \u2014 ~~$' + retail + '~~ *$' + i.price + '*';
+   }
+  }).join('\n\n');
+  msg =
+   'Hola HEAL \uD83D\uDC4B quiero ordenar (' + b2bLabel + '):\n\n' +
+   itemLines + '\n\n' +
+   '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n' +
+   'Subtotal retail: $' + retailTotal.toFixed(0) + '\n' +
+   'Descuento ' + b2bLabel + ' ' + discPct + ': -$' + discountTotal.toFixed(0) + '\n' +
+   'TOTAL: $' + total.toFixed(0) + '\n' +
+   '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n' +
+   'Quedo atento a la confirmaci\u00F3n de stock + datos de pago \uD83D\uDE4F\n\n' +
+   'Pedido ' + b2bLabel + ' \u00B7 ID: ' + orderNumber;
+ } else {
+  const itemLines = _cart.map(i => {
+   if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
+    const meta = STACK_SAVINGS[i.stackCode];
+    return meta.emoji + ' ' + i.name + ' \u2014 $' + i.price + '\n' +
+     ' (' + meta.shortComponents.join(', ') + ')' + '\n' +
+     ' Ahorro: $' + meta.savings + ' vs individual';
+   } else {
+    return '- ' + i.name + ' \u2014 $' + i.price;
+   }
+  }).join('\n\n');
+  msg =
+   'Hola HEAL \uD83D\uDC4B quiero ordenar:\n\n' +
+   itemLines + '\n\n' +
+   '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n' +
+   'TOTAL: $' + total.toFixed(0) + '\n' +
+   '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n' +
+   'Quedo atento a la confirmaci\u00F3n de stock + datos de pago \uD83D\uDE4F\n\n' +
+   (_activePromo?'\uD83C\uDFF7\uFE0F Promo: '+_activePromo.code+' (-$'+_activePromo.discountAmount+')\n\n':'') +
+   'Pedido desde la app HEAL \u00B7 ID: ' + orderNumber;
+ }
 
  // 3. Open WhatsApp IMMEDIATELY (must be synchronous in user-gesture context)
  window.open('https://wa.me/50688970649?text=' + encodeURIComponent(msg), '_blank');
@@ -2489,6 +2669,118 @@ function initAdminTab(){
  if(btn) btn.style.display=isAdmin()?'':'none';
 }
 
+
+let _b2bFilterActive = 'all';
+let _b2bAllUsers = [];
+
+async function adminLoadB2b() {
+  const el = document.getElementById('b2b-users-list');
+  if (!el) return;
+  el.innerHTML = '<span style="color:rgba(255,255,255,.35)">Loading...</span>';
+  try {
+    const rows = await adminFetch('heal_accounts?select=*&order=created_at.desc');
+    _b2bAllUsers = rows;
+    renderB2bUserList(rows);
+  } catch(e) {
+    el.innerHTML = '<span style="color:#F09595">\u274C ' + e.message + '</span>';
+  }
+}
+
+function adminB2bFilter(type) {
+  _b2bFilterActive = type;
+  document.querySelectorAll('[id^="b2b-filter-"]').forEach(b => b.style.background = '');
+  const active = document.getElementById('b2b-filter-' + type);
+  if (active) active.style.background = 'rgba(26,111,196,.4)';
+  const filtered = type === 'all' ? _b2bAllUsers : _b2bAllUsers.filter(u => u.account_type === type);
+  renderB2bUserList(filtered);
+}
+
+function renderB2bUserList(users) {
+  const el = document.getElementById('b2b-users-list');
+  if (!el) return;
+  if (!users.length) { el.innerHTML = '<span style="color:rgba(255,255,255,.3)">Sin usuarios en este filtro.</span>'; return; }
+  el.innerHTML = users.map(u => {
+    const typeBadge = u.account_type === 'distributor' ? '<span style="color:#f5c518;font-size:10px;font-weight:700">\uD83D\uDC51 DISTRIBUIDOR</span>' :
+      u.account_type === 'clinic' ? '<span style="color:#4fc3f7;font-size:10px;font-weight:700">\uD83C\uDFE5 CL\u00CDNICA</span>' :
+      '<span style="color:rgba(255,255,255,.35);font-size:10px">\uD83D\uDC64 RETAIL</span>';
+    const since = u.account_activated_at ? 'desde ' + new Date(u.account_activated_at).toLocaleDateString('es-CR',{day:'2-digit',month:'short'}) : '';
+    const adminBadge = u.is_admin ? ' <span style="color:#3aa0ff;font-size:9px">\u2699\uFE0F ADMIN</span>' : '';
+    const nameEsc = (u.full_name||'').replace(/'/g,"\\'");
+    const emailEsc = (u.email||'').replace(/'/g,"\\'");
+    return '<div style="padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,.06)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">' +
+      '<div>' +
+      '<div style="font-size:12px;color:#fff;font-weight:600">' + (u.full_name||'\u2014') + adminBadge + '</div>' +
+      '<div style="font-size:11px;color:rgba(255,255,255,.4)">' + u.email + '</div>' +
+      '<div style="margin-top:3px">' + typeBadge + (since ? ' <span style="font-size:10px;color:rgba(255,255,255,.3)">' + since + '</span>' : '') + '</div>' +
+      '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+      (u.account_type !== 'distributor' ? '<button onclick="openB2bModal(\''+emailEsc+'\',\''+nameEsc+'\',\'distributor\')" style="background:rgba(245,197,24,.15);border:0.5px solid rgba(245,197,24,.4);color:#f5c518;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">\u2192 Distribuidor</button>' : '') +
+      (u.account_type !== 'clinic' ? '<button onclick="openB2bModal(\''+emailEsc+'\',\''+nameEsc+'\',\'clinic\')" style="background:rgba(79,195,247,.15);border:0.5px solid rgba(79,195,247,.4);color:#4fc3f7;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">\u2192 Cl\u00EDnica</button>' : '') +
+      (u.account_type !== 'retail' ? '<button onclick="openB2bModal(\''+emailEsc+'\',\''+nameEsc+'\',\'retail\')" style="background:rgba(255,255,255,.08);border:0.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">\u2192 Retail</button>' : '') +
+      '</div>' +
+      (u.account_notes ? '<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;font-style:italic">' + u.account_notes + '</div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+let _b2bModalTarget = null;
+function openB2bModal(email, name, newType) {
+  _b2bModalTarget = { email, name, newType };
+  const modal = document.getElementById('b2b-modal');
+  const title = document.getElementById('b2b-modal-title');
+  const userEl = document.getElementById('b2b-modal-user');
+  const notes = document.getElementById('b2b-modal-notes');
+  const confirm = document.getElementById('b2b-modal-confirm');
+  if (!modal) return;
+  title.textContent = newType === 'distributor' ? '\uD83D\uDC51 Marcar como DISTRIBUIDOR' : newType === 'clinic' ? '\uD83C\uDFE5 Marcar como CL\u00CDNICA B2B' : '\uD83D\uDC64 Volver a RETAIL';
+  userEl.textContent = name + ' \u00B7 ' + email;
+  notes.value = '';
+  confirm.style.background = newType === 'distributor' ? 'rgba(245,197,24,.8)' : newType === 'clinic' ? 'rgba(79,195,247,.8)' : '#1a6fc4';
+  confirm.style.color = newType === 'retail' ? '#fff' : '#000';
+  confirm.onclick = confirmB2bChange;
+  modal.style.display = 'flex';
+}
+
+function closeB2bModal() {
+  const modal = document.getElementById('b2b-modal');
+  if (modal) modal.style.display = 'none';
+  _b2bModalTarget = null;
+}
+
+async function confirmB2bChange() {
+  if (!_b2bModalTarget) return;
+  const { email, newType } = _b2bModalTarget;
+  const notes = document.getElementById('b2b-modal-notes')?.value || '';
+  const confirmBtn = document.getElementById('b2b-modal-confirm');
+  if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Guardando...'; }
+  try {
+    const res = await fetch('/.netlify/functions/admin-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'change_account_type',
+        caller_email: currentUser.email,
+        target_email: email,
+        new_type: newType,
+        reason: notes
+      })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      closeB2bModal();
+      await adminLoadB2b();
+      showToast('\u2705 Cuenta actualizada \u2014 email enviado');
+    } else {
+      showToast('\u274C Error: ' + (data.error || 'unknown'));
+    }
+  } catch(e) {
+    showToast('\u274C Error: ' + e.message);
+  }
+  if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Confirmar'; }
+}
+
 async function adminFetch(path,opts={}){
  const url=SUPABASE_URL+'/rest/v1/'+path;
  const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
@@ -2501,6 +2793,7 @@ async function adminLoad(){
  if(!isAdmin()){document.getElementById('pg-admin').innerHTML='<div style="padding:40px;text-align:center;color:rgba(255,255,255,.3)">Access denied.</div>';return;}
  document.getElementById('admin-sub').textContent='Welcome, '+( currentUser.user_metadata?.full_name||currentUser.email);
  await Promise.all([adminLoadUsers(),adminLoadDoses(),adminLoadStories()]);
+ await adminLoadB2b();
 }
 
 async function adminLoadUsers(){
