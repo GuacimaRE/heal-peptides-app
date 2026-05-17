@@ -6,7 +6,7 @@ const ADMIN_EMAILS = ['henry@wercr.net', 'henry@urbancr.net'];
 
 const SUPABASE_URL = 'https://odtexqyvjxxdgysuxoxb.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kdGV4cXl2anh4ZGd5c3V4b3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE2MzMxMTcsImV4cCI6MjA1NzIwOTExN30.wbRNTCJUEYkuyHt_O8TMWRmfqxlS1s-bnl7FZ3DVyo';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kdGV4cXl2anh4ZGd5c3V4b3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMzc4MDksImV4cCI6MjA5MjkxMzgwOX0.SsKxglVIqU3Eq5zOsdDJQpk6m44R8FawYht49SADVyo';
 
 const RESEND_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = 'HEAL Peptides <welcome@healpeptides.net>';
