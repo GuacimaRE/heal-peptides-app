@@ -1106,6 +1106,8 @@ function nav(id,btn){
  if(id==='proto'){renderProto();renderCustomStack();}
  if(id==='admin')adminLoad();
  if(id==='labs') labsCheckConsent();
+ if(id==='calc'){calcFromMcg();updateCalc();}
+ if(id==='shop'&&_b2bDiscount>0)applyB2bPricing();
 }
 
 function switchMode(mode,btn){
