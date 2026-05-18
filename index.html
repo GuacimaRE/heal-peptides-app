@@ -306,6 +306,10 @@ select option{background:#1a1a28}
  <option value="10">Oxytocin — 2mg vial</option>
  <option value="80">Klow Blend — 80mg vial</option>
  </select>
+ <div id="pep-suggestion-calc" style="display:none;background:#0a1628;border:0.5px solid #1a4a80;border-radius:10px;padding:10px 12px;margin-top:8px;margin-bottom:4px">
+  <div style="font-size:10px;color:#3aa0ff;font-weight:600;margin-bottom:4px">SUGGESTED PROTOCOL</div>
+  <div id="pep-sug-text-calc" style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6"></div>
+ </div>
  <span class="lbl">BAC water added (mL)</span>
  <input type="number" id="c-bac" value="2" step="0.5" min="0.5" max="10" oninput="updateCalc()">
  <span class="lbl">Desired dose — enter mcg OR units, the other updates automatically</span>
@@ -1499,7 +1503,21 @@ function calcFromUnits(){
  document.getElementById('c-dose').value=Math.round(doseMcg);renderCalcResults(mg,bac,doseMcg,units);
 }
 
-function updateCalc(){calcFromMcg();}
+function updateCalc(){
+ calcFromMcg();
+ const sel=document.getElementById('c-pep');
+ if(!sel)return;
+ const pepName=(sel.options[sel.selectedIndex]&&sel.options[sel.selectedIndex].text||'').split(' — ')[0].trim();
+ const box=document.getElementById('pep-suggestion-calc');
+ const textEl=document.getElementById('pep-sug-text-calc');
+ if(!box||!textEl)return;
+ const p=PEP_PROTOCOLS[pepName],tp=TITRATION_PROTOCOLS[pepName];
+ if(!p&&!tp){box.style.display='none';return;}
+ box.style.display='block';
+ const bacVal=parseFloat(document.getElementById('c-bac')&&document.getElementById('c-bac').value)||(tp&&tp.bacMl||2);
+ if(tp){textEl.innerHTML=buildTitrationHTML(pepName,bacVal)||'';}
+ else{textEl.innerHTML='<b style="color:#fff">'+pepName+'</b><br>Dose: <span style="color:#5DCAA5">'+p.dose+'</span> · '+p.freq+'<br>'+p.notes;}
+}
 
 // ── AUTH ──────────────────────────────────────────────
 let currentUser = null;
