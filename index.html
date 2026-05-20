@@ -127,7 +127,7 @@ select option{background:#1a1a28}
 .cart-summary{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .cart-count{font-size:13px;font-weight:600;color:#3aa0ff}
 .cart-total{font-size:16px;font-weight:700;color:#fff}
-.cart-items-list{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:10px;line-height:1.6;max-height:60px;overflow-y:auto}
+.cart-items-list{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:10px;line-height:1.6;max-height:200px;overflow-y:auto}
 .cart-actions{display:flex;gap:8px}
 .cart-clear{flex:0 0 auto;background:rgba(226,75,74,.15);border:0.5px solid rgba(226,75,74,.4);color:#F09595;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif}
 .cart-order{flex:1;background:#25D366;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif}
@@ -158,6 +158,23 @@ select option{background:#1a1a28}
 .add-pep-box{background:#0a0a14;border-radius:14px;padding:14px;border:0.5px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:8px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .empty-stack{font-size:12px;color:rgba(255,255,255,.3);text-align:center;padding:20px;background:#0a0a14;border-radius:12px;border:0.5px dashed rgba(255,255,255,.1)}
+.qty-row{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin:5px 0 6px}
+.qty-btn{width:26px;height:26px;border-radius:7px;background:rgba(26,111,196,.15);border:0.5px solid rgba(26,111,196,.4);color:#3aa0ff;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.qty-btn:active{background:rgba(26,111,196,.35)}
+.qty-in{width:38px;background:#0a0a14;border:0.5px solid rgba(255,255,255,.12);border-radius:7px;color:#fff;font-size:14px;font-weight:600;text-align:center;padding:3px 0;font-family:'Inter',sans-serif;-moz-appearance:textfield;outline:none}
+.qty-in::-webkit-inner-spin-button,.qty-in::-webkit-outer-spin-button{-webkit-appearance:none}
+.cart-item-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,.06)}
+.cart-item-row:last-child{border:none}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-name{font-size:12px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cart-item-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+.cart-item-controls{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.cart-qty-btn{width:22px;height:22px;border-radius:5px;background:rgba(26,111,196,.15);border:0.5px solid rgba(26,111,196,.35);color:#3aa0ff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;line-height:1;-webkit-tap-highlight-color:transparent}
+.cart-qty-btn:active{background:rgba(26,111,196,.35)}
+.cart-qty-num{font-size:13px;font-weight:700;color:#fff;min-width:18px;text-align:center}
+.cart-item-total{font-size:12px;font-weight:700;color:#fff;min-width:44px;text-align:right;flex-shrink:0}
+.cart-remove{background:none;border:none;color:rgba(255,255,255,.25);font-size:15px;cursor:pointer;padding:0 0 0 2px;line-height:1;-webkit-tap-highlight-color:transparent}
+.cart-remove:active{color:#E24B4A}
 </style>
 </head>
 <body>
@@ -592,6 +609,24 @@ select option{background:#1a1a28}
   <div id="admin-users-list" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.5)">Loading...</div>
  </div>
 
+ <!-- Invite Customer -->
+ <div class="card">
+  <div class="ct">&#x2709;&#xFE0F; Invitar Cliente</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:12px">El cliente recibe un email con link para crear su cuenta. Solo usuarios invitados pueden registrarse.</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+   <div>
+    <label class="lbl" style="margin-top:0">Nombre</label>
+    <input id="inv-name" placeholder="Ana L\u00F3pez" style="width:100%">
+   </div>
+   <div>
+    <label class="lbl">Email</label>
+    <input id="inv-email" type="email" placeholder="cliente@email.com" style="width:100%">
+   </div>
+   <button class="btn" id="inv-btn" onclick="sendInvite()" style="margin-top:4px">&#x2709;&#xFE0F; Enviar Invitaci\u00F3n</button>
+   <div id="inv-msg" style="font-size:12px;text-align:center;min-height:18px"></div>
+  </div>
+ </div>
+
  <!-- B2B User Management -->
  <div class="card" id="b2b-mgmt-card">
   <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
@@ -744,7 +779,7 @@ select option{background:#1a1a28}
  <!-- GLP-1 / Weight -->
  <div class="card shop-section" data-cat="glp1">
   <div class="ct">⚖️ GLP-1 / Weight Management</div>
-  <div class="prod-row"><div><div class="pname">Tirzepatide 15mg</div><div class="pdose">Dual GIP/GLP-1 agonist</div></div><div style="text-align:right"><div class="pprice">$75</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
+  <div class="prod-row"><div><div class="pname">Tirzepatide 15mg</div><div class="pdose">Dual GIP/GLP-1 agonist</div></div><div style="text-align:right"><div class="pprice">$95</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
   <div class="prod-row"><div><div class="pname">Tirzepatide 30mg</div><div class="pdose">Dual GIP/GLP-1 agonist — high dose</div></div><div style="text-align:right"><div class="pprice">$120</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
   <div class="prod-row"><div><div class="pname">Retatrutide 20mg</div><div class="pdose">Triple GLP-1/GIP/Glucagon</div></div><div style="text-align:right"><div class="pprice">$220</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
   <div class="prod-row"><div><div class="pname">Retatrutide 10mg</div><div class="pdose">Triple GLP-1/GIP/Glucagon</div></div><div style="text-align:right"><div class="pprice">$120</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
@@ -1005,7 +1040,7 @@ const PEP_PROTOCOLS={
  'NAD+':{dose:'75mg',freq:'Daily',notes:'SubQ slowly. 500mg vial + 2mL BAC = 250mg/mL. 30 units. 5 on / 2 off.'},
  'KPV':{dose:'500mcg',freq:'Daily',notes:'SubQ or oral. 5mg + 2mL BAC. Stack with BPC-157.'},
  // Blends (kept as-is for product compatibility)
- 'Glow Blend':{dose:'4mg',freq:'Daily',notes:'SubQ daily. 60mg vial + 3mL BAC = 20mg/mL. 20u per dose.'},
+ 'Glow Blend':{dose:'4mg',freq:'Daily',notes:'SubQ daily. 60mg vial + 3mL BAC = 20mg/mL. 20u per dose. 5 days on / 2 days off.'},
  'Klow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
 };
 
@@ -1107,7 +1142,7 @@ function nav(id,btn){
  if(id==='admin')adminLoad();
  if(id==='labs') labsCheckConsent();
  if(id==='calc'){calcFromMcg();updateCalc();}
- if(id==='shop'&&_b2bDiscount>0)applyB2bPricing();
+ if(id==='shop'){if(_b2bDiscount>0)applyB2bPricing();setTimeout(initShopQuantities,30);}
 }
 
 function switchMode(mode,btn){
@@ -1267,8 +1302,10 @@ function quickStackOrder(){
   const stack = STACKS[code];
   const idx = _cart.findIndex(i => i.stackCode === code);
   if(idx < 0){
-    const b2bStackPrice = parseFloat(card.getAttribute('data-b2b-price'));
-  _cart.push({ name: stack.name, price: (_b2bDiscount > 0 && b2bStackPrice) ? b2bStackPrice : stack.price, origPrice: stack.price, isStack: true, stackCode: code, components: stack.components });
+    const stackCard = document.querySelector('.stack-bundle-card[data-stack-code="'+code+'"]');
+    const b2bStackPrice = stackCard ? parseFloat(stackCard.getAttribute('data-b2b-price')) : 0;
+    const unitPrice = (_b2bDiscount > 0 && b2bStackPrice) ? b2bStackPrice : stack.price;
+  _cart.push({ name: stack.name, unit_price: unitPrice, orig_unit_price: stack.price, quantity: 1, price: unitPrice, origPrice: stack.price, isStack: true, stackCode: code, components: stack.components });
    cartRender();
   }
   document.querySelectorAll('.stack-bundle-card').forEach(card => {
@@ -1278,8 +1315,8 @@ function quickStackOrder(){
    }
   });
  } else if(code === 'WEIGHT_COMBO'){
-  if(!_cart.find(i=>i.name==='Tirzepatide 15mg')) _cart.push({name:'Tirzepatide 15mg',price:75});
-  if(!_cart.find(i=>i.name==='Glow Blend 60mg')) _cart.push({name:'Glow Blend 60mg',price:185});
+  if(!_cart.find(i=>i.name==='Tirzepatide 15mg')) _cart.push({name:'Tirzepatide 15mg',unit_price:95,orig_unit_price:95,quantity:1,price:95,origPrice:95});
+  if(!_cart.find(i=>i.name==='Glow Blend 60mg')) _cart.push({name:'Glow Blend 60mg',unit_price:185,orig_unit_price:185,quantity:1,price:185,origPrice:185});
   cartRender();
  }
 
@@ -1774,8 +1811,12 @@ function stackAdd(btn){
   btn.textContent = '+ Add Stack';
   btn.classList.remove('in-cart');
  } else {
-  _cart.push({ name: stack.name, price: stack.price, isStack: true, stackCode: code, components: stack.components });
-  btn.textContent = '✓ Added';
+  const qtyInput = card.querySelector('.qty-in');
+  const qty = qtyInput ? Math.min(99, Math.max(1, parseInt(qtyInput.value)||1)) : 1;
+  const b2bStackPrice = parseFloat(card.getAttribute('data-b2b-price'));
+  const unitPrice = (_b2bDiscount > 0 && b2bStackPrice) ? b2bStackPrice : stack.price;
+  _cart.push({ name: stack.name, unit_price: unitPrice, orig_unit_price: stack.price, quantity: qty, price: unitPrice * qty, origPrice: stack.price * qty, isStack: true, stackCode: code, components: stack.components });
+  btn.textContent = qty > 1 ? '✓ Added (×'+qty+')' : '✓ Added';
   btn.classList.add('in-cart');
  }
  cartRender();
@@ -1784,17 +1825,20 @@ function stackAdd(btn){
 function orderWA(btn){
  const row=btn.closest('.prod-row');
  const name=row?row.querySelector('.pname').textContent.trim():'';
- const priceStr=row?row.querySelector('.pprice').textContent.trim():'';
- const price=parseFloat(priceStr.replace('$',''))||0;
+ const priceEl=row?row.querySelector('.pprice'):null;
+ const origRetail=priceEl?parseFloat(priceEl.getAttribute('data-orig')||priceEl.textContent.replace(/[^0-9.]/g,''))||0:0;
+ const b2bPrice=parseFloat(btn.getAttribute('data-b2b-price'));
+ const unitPrice=(_b2bDiscount>0&&b2bPrice)?b2bPrice:origRetail;
+ const qtyInput=row?row.querySelector('.qty-in'):null;
+ const qty=qtyInput?Math.min(99,Math.max(1,parseInt(qtyInput.value)||1)):1;
  const idx=_cart.findIndex(i=>i.name===name);
  if(idx>=0){
   _cart.splice(idx,1);
   btn.textContent='+ Add';
   btn.classList.remove('in-cart');
  }else{
-   const b2bPrice = parseFloat(btn.getAttribute('data-b2b-price'));
-  _cart.push({name, price: (_b2bDiscount > 0 && b2bPrice) ? b2bPrice : price, origPrice: price});
-  btn.textContent='✓ Added';
+  _cart.push({name, unit_price:unitPrice, orig_unit_price:origRetail, quantity:qty, price:unitPrice*qty, origPrice:origRetail*qty});
+  btn.textContent=qty>1?'✓ Added (×'+qty+')':'✓ Added';
   btn.classList.add('in-cart');
  }
  cartRender();
@@ -1893,6 +1937,7 @@ function applyB2bPricing() {
     }
   });
   cartRender();
+ setTimeout(initShopQuantities,30);
 }
 
 function renderB2bBadge() {
@@ -1977,18 +2022,43 @@ function cartRender(){
  const listEl=document.getElementById('cart-items-list');
  const promoRow=document.getElementById('promo-row');
  if(!bar)return;
- if(_cart.length===0){bar.classList.remove('show');_activePromo=null;return;}
+ const shopPg=document.getElementById('pg-shop');
+ if(_cart.length===0){bar.classList.remove('show');_activePromo=null;if(shopPg)shopPg.style.paddingBottom='';return;}
  bar.classList.add('show');
  if(promoRow)promoRow.style.display=_cart.some(i=>i.isStack)?'block':'none';
+ // Normalize: ensure price = unit_price * qty
+ _cart.forEach(i=>{
+  if(i.unit_price===undefined) i.unit_price=i.price;
+  if(i.quantity===undefined) i.quantity=1;
+  i.price=i.unit_price*i.quantity;
+ });
  const subtotal=_cart.reduce((a,i)=>a+i.price,0);
  const disc=_activePromo?_activePromo.discountAmount:0;
- countEl.textContent=_cart.length;
+ const grandTotal=subtotal-disc;
+ countEl.textContent=_cart.reduce((a,i)=>a+(i.quantity||1),0);
  if(disc>0){
-  totalEl.innerHTML='<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:13px">$'+subtotal.toFixed(0)+'</span> <span style="color:#5DCAA5">$'+(subtotal-disc).toFixed(0)+'</span>';
+  totalEl.innerHTML='<span style="text-decoration:line-through;color:rgba(255,255,255,.35);font-size:13px">$'+subtotal.toFixed(0)+'</span> <span style="color:#5DCAA5">$'+grandTotal.toFixed(0)+'</span>';
  }else{
-  totalEl.textContent=subtotal.toFixed(0);
+  totalEl.textContent=grandTotal.toFixed(0);
  }
- listEl.textContent=_cart.map(i=>i.name+(i.price?' ($'+i.price+')':'')).join(' · ');
+ // Per-item rows with quantity controls
+ // Adjust shop scroll padding to match cart bar height
+ setTimeout(()=>{if(shopPg&&bar)shopPg.style.paddingBottom=(bar.offsetHeight+16)+'px';},50);
+ listEl.innerHTML=_cart.map((item,idx)=>{
+  const qty=item.quantity||1;
+  const up=item.unit_price||item.price;
+  const tot=up*qty;
+  const subLabel=qty>1?'$'+up.toFixed(2)+' × '+qty+' = $'+tot.toFixed(2):'$'+tot.toFixed(2);
+  return '<div class="cart-item-row">'+
+   '<div class="cart-item-info"><div class="cart-item-name">'+item.name+'</div><div class="cart-item-sub">'+subLabel+'</div></div>'+
+   '<div class="cart-item-controls">'+
+    '<button class="cart-qty-btn" onclick="cartQtyChange('+idx+',-1)">−</button>'+
+    '<span class="cart-qty-num">'+qty+'</span>'+
+    '<button class="cart-qty-btn" onclick="cartQtyChange('+idx+',1)">+</button>'+
+    '<button class="cart-remove" onclick="cartRemoveItem('+idx+')">&#x1F5D1;&#xFE0F;</button>'+
+   '</div>'+
+  '</div>';
+ }).join('');
 }
 
 function cartClear(){
@@ -1999,6 +2069,8 @@ function cartClear(){
   b.textContent=b.classList.contains('stack-add-btn')?'+ Add Stack':'+ Add';
   b.classList.remove('in-cart');
  });
+ // Reset all qty inputs back to 1
+ document.querySelectorAll('#pg-shop .qty-in').forEach(inp=>inp.value=1);
  cartRender();
 }
 
@@ -2027,16 +2099,24 @@ function cartOrderWA(){
  if (_b2bDiscount > 0) {
   const b2bLabel = _b2bType === 'distributor' ? 'DISTRIBUIDOR' : 'CL\u00CDNICA';
   const discPct = _b2bType === 'distributor' ? '25%' : '20%';
-  const retailTotal = _cart.reduce((a,i) => a + (i.origPrice || i.price), 0);
+  const retailTotal = _cart.reduce((a,i)=>a+((i.orig_unit_price||i.unit_price||i.price)*(i.quantity||1)),0);
   const discountTotal = retailTotal - total;
   const itemLines = _cart.map(i => {
-   const retail = i.origPrice || i.price;
+   const qty = i.quantity || 1;
+   const up = i.unit_price || i.price;
+   const retailUp = i.orig_unit_price || up;
+   const itemTot = up * qty;
    if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
     const meta = STACK_SAVINGS[i.stackCode];
-    return meta.emoji + ' ' + i.name + ' \u2014 ~~$' + retail + '~~ *$' + i.price + '*\n' +
-     ' (' + meta.shortComponents.join(', ') + ')';
+    const qtyStr = qty > 1
+     ? ' \u2014 ' + qty + ' unidades\n $' + up.toFixed(2) + ' c/u = $' + itemTot.toFixed(2)
+     : ' \u2014 ~~$' + retailUp.toFixed(0) + '~~ *$' + up.toFixed(2) + '*';
+    return meta.emoji + ' ' + i.name + qtyStr + '\n (' + meta.shortComponents.join(', ') + ')';
    } else {
-    return '- ' + i.name + ' \u2014 ~~$' + retail + '~~ *$' + i.price + '*';
+    const qtyStr = qty > 1
+     ? ' \u2014 ' + qty + ' unidades\n $' + up.toFixed(2) + ' c/u = $' + itemTot.toFixed(2)
+     : ' \u2014 ~~$' + retailUp.toFixed(0) + '~~ *$' + up.toFixed(2) + '*';
+    return '- ' + i.name + qtyStr;
    }
   }).join('\n\n');
   msg =
@@ -2051,23 +2131,33 @@ function cartOrderWA(){
    'Pedido ' + b2bLabel + ' \u00B7 ID: ' + orderNumber;
  } else {
   const itemLines = _cart.map(i => {
+   const qty = i.quantity || 1;
+   const up = i.unit_price || i.price;
+   const itemTot = up * qty;
    if(i.isStack && i.stackCode && STACK_SAVINGS[i.stackCode]){
     const meta = STACK_SAVINGS[i.stackCode];
-    return meta.emoji + ' ' + i.name + ' \u2014 $' + i.price + '\n' +
-     ' (' + meta.shortComponents.join(', ') + ')' + '\n' +
-     (/* no bundle savings line for B2B — distributor price already includes their discount */ '');
+    const qtyStr = qty > 1
+     ? ' \u2014 ' + qty + ' unidades\n $' + up.toFixed(2) + ' c/u = $' + itemTot.toFixed(2)
+     : ' \u2014 $' + itemTot.toFixed(2);
+    const savingsLine = '\n Ahorro: $' + (meta.savings * qty) + ' vs individual';
+    return meta.emoji + ' ' + i.name + qtyStr + '\n (' + meta.shortComponents.join(', ') + ')' + savingsLine;
    } else {
-    return '- ' + i.name + ' \u2014 $' + i.price;
+    const qtyStr = qty > 1
+     ? ' \u2014 ' + qty + ' unidades\n $' + up.toFixed(2) + ' c/u = $' + itemTot.toFixed(2)
+     : ' \u2014 $' + itemTot.toFixed(2);
+    return '- ' + i.name + qtyStr;
    }
   }).join('\n\n');
+  const totalSection = _activePromo
+   ? 'Subtotal: $' + subtotal.toFixed(0) + '\n\uD83C\uDFF7\uFE0F Promo ' + _activePromo.code + ': -$' + _activePromo.discountAmount + '\nTOTAL: $' + total.toFixed(0)
+   : 'TOTAL: $' + total.toFixed(0);
   msg =
    'Hola HEAL \uD83D\uDC4B quiero ordenar:\n\n' +
    itemLines + '\n\n' +
    '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n' +
-   'TOTAL: $' + total.toFixed(0) + '\n' +
+   totalSection + '\n' +
    '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n' +
    'Quedo atento a la confirmaci\u00F3n de stock + datos de pago \uD83D\uDE4F\n\n' +
-   (_activePromo?'\uD83C\uDFF7\uFE0F Promo: '+_activePromo.code+' (-$'+_activePromo.discountAmount+')\n\n':'') +
    'Pedido desde la app HEAL \u00B7 ID: ' + orderNumber;
  }
 
@@ -2084,9 +2174,16 @@ function cartOrderWA(){
 
  // 5. Save to Supabase in background (non-blocking)
  const itemsJson = _cart.map(i => ({
-  name: i.name, price: i.price,
-  isStack: !!i.isStack, stackCode: i.stackCode||null, components: i.components||null
+  type: i.isStack ? 'stack' : 'product',
+  code: i.stackCode || null,
+  name: i.name,
+  unit_price: i.unit_price || i.price,
+  quantity: i.quantity || 1,
+  subtotal: (i.unit_price || i.price) * (i.quantity || 1),
+  components: i.components || null
  }));
+ const subtotalRetail = _cart.reduce((a,i)=>a+((i.orig_unit_price||i.unit_price||i.price)*(i.quantity||1)),0);
+ const discountAmount = subtotalRetail - total;
  fetch(SUPABASE_URL + '/rest/v1/orders', {
   method: 'POST',
   headers: {
@@ -2099,8 +2196,11 @@ function cartOrderWA(){
    status: 'pending_whatsapp',
    total_amount: total,
    items: itemsJson,
+   subtotal_retail: subtotalRetail,
+   discount_type: _b2bDiscount > 0 ? _b2bType : (_activePromo ? 'promo' : null),
+   discount_percent: _b2bDiscount > 0 ? (_b2bDiscount * 100) : null,
+   discount_amount: discountAmount > 0 ? discountAmount : (disc||null),
    promo_code: _activePromo?_activePromo.code:null,
-   discount_amount: disc||null,
    whatsapp_sent_at: new Date().toISOString()
   })
  }).catch(e => console.warn('Order save failed:', e));
@@ -2951,6 +3051,118 @@ async function adminAddStory(){
   await adminLoadStories();
   showToast('Story saved!');
  }catch(e){alert('Error: '+e.message);}
+}
+
+// ── INVITE CUSTOMER ─────────────────────────────────────────────────────────
+async function sendInvite(){
+ const email = (document.getElementById('inv-email').value||'').trim();
+ const name  = (document.getElementById('inv-name').value||'').trim();
+ const msg   = document.getElementById('inv-msg');
+ const btn   = document.getElementById('inv-btn');
+ if(!email){msg.style.color='#F09595';msg.textContent='\u26A0\uFE0F Ingres\u00E1 el email del cliente.';return;}
+ if(!currentUser){msg.style.color='#F09595';msg.textContent='No hay sesi\u00F3n activa.';return;}
+ btn.disabled=true;btn.textContent='Enviando...';
+ msg.style.color='rgba(255,255,255,.4)';msg.textContent='';
+ try{
+  const token=currentUser.token&&currentUser.token.access_token;
+  const res=await fetch('/.netlify/functions/invite-user',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+   body:JSON.stringify({email,name})
+  });
+  const data=await res.json();
+  if(res.ok){
+   msg.style.color='#5DCAA5';
+   msg.textContent='\u2705 Invitaci\u00F3n enviada a '+email;
+   document.getElementById('inv-email').value='';
+   document.getElementById('inv-name').value='';
+  } else {
+   msg.style.color='#F09595';
+   msg.textContent='\u274C '+(data.error||'Error enviando invitaci\u00F3n');
+  }
+ }catch(e){
+  msg.style.color='#F09595';msg.textContent='\u274C Error de red: '+e.message;
+ }finally{
+  btn.disabled=false;btn.textContent='\u2709\uFE0F Enviar Invitaci\u00F3n';
+ }
+}
+
+// ============================================
+// TICKET #6 — Quantity selector helpers
+// ============================================
+function initShopQuantities(){
+ // Product rows
+ document.querySelectorAll('#pg-shop .prod-row').forEach(row=>{
+  if(row.querySelector('.qty-row'))return;
+  const rightDiv=row.querySelector('[style*="text-align:right"]');
+  if(!rightDiv)return;
+  const qtyRow=document.createElement('div');
+  qtyRow.className='qty-row';
+  qtyRow.innerHTML='<button class="qty-btn" onclick="qtyChange(this,-1)">−</button><input class="qty-in" type="number" value="1" min="1" max="99" oninput="qtyClamp(this)"><button class="qty-btn" onclick="qtyChange(this,1)">+</button>';
+  const addBtn=rightDiv.querySelector('.padd');
+  if(addBtn)rightDiv.insertBefore(qtyRow,addBtn);
+ });
+ // Stack cards
+ document.querySelectorAll('.stack-bundle-card').forEach(card=>{
+  if(card.querySelector('.stack-qty-row'))return;
+  const addBtn=card.querySelector('.stack-add-btn');
+  if(!addBtn)return;
+  const qtyRow=document.createElement('div');
+  qtyRow.className='qty-row stack-qty-row';
+  qtyRow.style.cssText='justify-content:center;margin-bottom:8px';
+  qtyRow.innerHTML='<span style="font-size:11px;color:rgba(255,255,255,.45);margin-right:6px">Cantidad:</span><button class="qty-btn" onclick="qtyChange(this,-1)">−</button><input class="qty-in" type="number" value="1" min="1" max="99" oninput="qtyClamp(this)"><button class="qty-btn" onclick="qtyChange(this,1)">+</button>';
+  addBtn.parentNode.insertBefore(qtyRow,addBtn);
+ });
+}
+
+function qtyChange(btn,delta){
+ const input=btn.parentElement.querySelector('.qty-in');
+ if(!input)return;
+ let val=Math.min(99,Math.max(1,(parseInt(input.value)||1)+delta));
+ input.value=val;
+}
+
+function qtyClamp(input){
+ let val=parseInt(input.value)||1;
+ if(val<1)val=1;
+ if(val>99)val=99;
+ input.value=val;
+}
+
+function cartQtyChange(idx,delta){
+ if(!_cart[idx])return;
+ const newQty=Math.min(99,Math.max(1,(_cart[idx].quantity||1)+delta));
+ _cart[idx].quantity=newQty;
+ _cart[idx].price=(_cart[idx].unit_price||_cart[idx].price)*newQty;
+ cartRender();
+}
+
+function cartRemoveItem(idx){
+ if(!_cart[idx])return;
+ const item=_cart[idx];
+ // Reset shop button state
+ if(item.isStack){
+  document.querySelectorAll('.stack-bundle-card').forEach(card=>{
+   if(card.dataset.stackCode===item.stackCode){
+    const btn=card.querySelector('.stack-add-btn');
+    if(btn){btn.textContent='+ Add Stack';btn.classList.remove('in-cart');}
+    const qi=card.querySelector('.qty-in');
+    if(qi)qi.value=1;
+   }
+  });
+ } else {
+  document.querySelectorAll('#pg-shop .prod-row').forEach(row=>{
+   const nameEl=row.querySelector('.pname');
+   if(nameEl&&nameEl.textContent.trim()===item.name){
+    const btn=row.querySelector('.padd');
+    if(btn){btn.textContent='+ Add';btn.classList.remove('in-cart');}
+    const qi=row.querySelector('.qty-in');
+    if(qi)qi.value=1;
+   }
+  });
+ }
+ _cart.splice(idx,1);
+ cartRender();
 }
 
 </script>
