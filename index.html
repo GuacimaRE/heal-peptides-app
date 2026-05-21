@@ -3064,7 +3064,19 @@ async function sendInvite(){
  btn.disabled=true;btn.textContent='Enviando...';
  msg.style.color='rgba(255,255,255,.4)';msg.textContent='';
  try{
-  const token=currentUser.token&&currentUser.token.access_token;
+  // Obtener token fresco via jwt() para manejar expiración/refresh automático
+  const ni=window.netlifyIdentity;
+  const u=ni?ni.currentUser():currentUser;
+  if(!u){msg.style.color='#F09595';msg.textContent='Sesi\u00F3n expirada. Recarg\u00E1 la p\u00E1gina.';btn.disabled=false;btn.textContent='\u2709\uFE0F Enviar Invitaci\u00F3n';return;}
+  let token;
+  if(typeof u.jwt==='function'){
+   try{token=await u.jwt();}catch(e){token=u.token&&u.token.access_token;}
+  }else{
+   token=u.token&&u.token.access_token;
+  }
+  if(!token||typeof token!=='string'){
+   msg.style.color='#F09595';msg.textContent='Sesi\u00F3n expirada. Recarg\u00E1 la p\u00E1gina.';btn.disabled=false;btn.textContent='\u2709\uFE0F Enviar Invitaci\u00F3n';return;
+  }
   const res=await fetch('/.netlify/functions/invite-user',{
    method:'POST',
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
