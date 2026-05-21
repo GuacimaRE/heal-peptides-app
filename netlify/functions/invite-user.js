@@ -1,9 +1,10 @@
 // invite-user.js — Send Netlify Identity invite to a new customer
-// Security: caller_email must be in ADMIN_EMAILS
-// Requires env vars: NETLIFY_TOKEN (PAT), NETLIFY_SITE_ID
+// Uses GoTrue admin API at /.netlify/identity/admin/invite
+// The caller's JWT is forwarded — the caller must have is_admin:true in Netlify Identity
+// ADMIN_EMAILS is a secondary gate (email allowlist)
 
 const ADMIN_EMAILS = ['henry@wercr.net', 'henry@urbancr.net'];
-const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID || 'f9ec04d0-5dc3-4f82-87dc-e1f4ddab7e4c';
+const SITE_URL = process.env.URL || 'https://app.healpeptides.net';
 
 exports.handler = async (event) => {
   const headers = {
@@ -14,21 +15,24 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
 
-  // ── 1. Verify caller is admin ──────────────────────────────────────────────
+  // ── 1. Verify caller is admin (email allowlist) ───────────────────────────
+  const auth = event.headers.authorization || event.headers.Authorization || '';
+  const callerToken = auth.replace(/^Bearer\s+/i, '').trim();
+
+  if (!callerToken) {
+    return { statusCode: 401, headers, body: JSON.stringify({ error: 'Missing auth token' }) };
+  }
+
+  let callerEmail = '';
   try {
-    const auth = event.headers.authorization || event.headers.Authorization || '';
-    const token = auth.replace(/^Bearer\s+/i, '');
-    if (!token) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Missing auth token' }) };
-
-    // Decode JWT payload (no signature verification — Netlify Identity already validated it)
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
-    const callerEmail = payload.email || '';
-
-    if (!ADMIN_EMAILS.includes(callerEmail)) {
-      return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden — not an admin account' }) };
-    }
+    const payload = JSON.parse(Buffer.from(callerToken.split('.')[1], 'base64url').toString());
+    callerEmail = payload.email || '';
   } catch (e) {
     return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) };
+  }
+
+  if (!ADMIN_EMAILS.includes(callerEmail.toLowerCase())) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden — not an admin account' }) };
   }
 
   // ── 2. Parse invite email ──────────────────────────────────────────────────
@@ -45,31 +49,35 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid email address' }) };
   }
 
-  // ── 3. Send invite via Netlify Identity API ────────────────────────────────
-  const NETLIFY_TOKEN = process.env.NETLIFY_TOKEN;
-  if (!NETLIFY_TOKEN) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'NETLIFY_TOKEN env var not configured' }) };
-  }
+  // ── 3. Send invite via GoTrue admin endpoint ──────────────────────────────
+  // Requires the caller to have is_admin:true in Netlify Identity
+  const goTrueUrl = `${SITE_URL}/.netlify/identity/admin/invite`;
 
-  const inviteRes = await fetch(
-    `https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/identity/users/invite`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${NETLIFY_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        invites: [{ email: inviteEmail, data: { full_name: inviteName || inviteEmail.split('@')[0] } }]
-      })
-    }
-  );
+  const inviteRes = await fetch(goTrueUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${callerToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email: inviteEmail,
+      data: { full_name: inviteName || inviteEmail.split('@')[0] }
+    })
+  });
 
   const result = await inviteRes.json().catch(() => ({}));
 
   if (!inviteRes.ok) {
-    console.error('Netlify invite error:', result);
-    const msg = result?.message || result?.error || JSON.stringify(result);
+    console.error('GoTrue invite error:', inviteRes.status, result);
+    // Mensaje amigable si el usuario no tiene is_admin
+    if (inviteRes.status === 403 || result?.msg?.includes('admin')) {
+      return {
+        statusCode: 403,
+        headers,
+        body: JSON.stringify({ error: 'Tu cuenta no tiene permisos de admin en Netlify Identity. Contactá a soporte.' })
+      };
+    }
+    const msg = result?.msg || result?.message || result?.error || JSON.stringify(result);
     return { statusCode: 500, headers, body: JSON.stringify({ error: msg }) };
   }
 
