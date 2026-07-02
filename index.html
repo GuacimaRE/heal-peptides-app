@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="app-version" content="7">
+<script>fetch('/version.json?nc='+Date.now()).then(r=>r.json()).then(d=>{const cur=parseInt(document.querySelector('meta[name=app-version]').content);if(d.v>cur){if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(regs=>{regs.forEach(r=>r.unregister());});caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k))));}setTimeout(()=>location.reload(true),200);}}).catch(()=>{});</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -267,11 +269,11 @@ select option{background:#1a1a28}
  <select id="home-pep-select" onchange="autofillHome()" style="width:100%;background:#1a1a28;border:0.5px solid rgba(255,255,255,.1);border-radius:9px;color:#fff;padding:8px 12px;font-size:13px;outline:none;font-family:'Inter',sans-serif;-webkit-appearance:none;margin-bottom:8px">
  <optgroup label="GLP-1 / Weight"><option>Tirzepatide</option><option>Retatrutide</option><option>Mazdutide</option><option>Semaglutide</option></optgroup>
  <optgroup label="Recovery"><option>BPC-157</option><option>TB-500</option><option>GHK-Cu</option><option>IGF-1 LR3</option></optgroup>
- <optgroup label="GH / Anti-aging"><option>Ipamorelin</option><option>CJC-1295 (no DAC)</option><option>CJC-1295 DAC</option><option>Ipamorelin / CJC blend</option><option>Sermorelin</option><option>Tesamorelin</option><option>Epithalon</option></optgroup>
+ <optgroup label="GH / Anti-aging"><option>Ipamorelin</option><option>CJC-1295 (no DAC)</option><option>CJC-1295 DAC</option><option>Ipamorelin / CJC blend</option><option>Ipa + CJC 1295</option><option>Sermorelin</option><option>Tesamorelin</option><option>Epithalon</option></optgroup>
  <optgroup label="Cognitive"><option>Semax</option><option>Selank</option></optgroup>
  <optgroup label="Metabolic"><option>MOTS-C</option><option>5-Amino-1MQ</option></optgroup>
  <optgroup label="Immune"><option>LL-37</option></optgroup>
- <optgroup label="Other"><option>PT-141</option><option>Melanotan II</option><option>NAD+</option><option>KPV</option></optgroup>
+ <optgroup label="Other"><option>PT-141</option><option>Melanotan II</option><option>NAD+</option><option>KPV</option><option>DSIP</option></optgroup>
  <optgroup label="Blends"><option>Glow Blend</option><option>Klow Blend</option></optgroup>
  </select>
  <input type="text" id="home-pep-detail" placeholder="Dose & notes (e.g. 250mcg · Daily · AM)" style="width:100%;background:#1a1a28;border:0.5px solid rgba(255,255,255,.1);border-radius:9px;color:#fff;padding:8px 12px;font-size:13px;outline:none;font-family:'Inter',sans-serif;margin-bottom:8px">
@@ -303,6 +305,7 @@ select option{background:#1a1a28}
  <option value="60">Glow Blend — 60mg vial</option>
  <option value="10">Ipamorelin — 10mg vial</option>
  <option value="10">Ipamorelin / CJC blend — 10mg vial</option>
+ <option value="10">Ipa + CJC 1295 — 10mg vial</option>
  <option value="10">MOTS-C — 10mg vial</option>
  <option value="10">Semax — 10mg vial</option>
  <option value="10">Selank — 10mg vial</option>
@@ -315,6 +318,7 @@ select option{background:#1a1a28}
  <option value="10">SS-31 — 10mg vial</option>
  <option value="500">NAD+ — 500mg vial</option>
  <option value="10">KPV — 10mg vial</option>
+ <option value="10">DSIP — 10mg vial</option>
  <option value="10">PT-141 — 10mg vial</option>
   <option value="10">5-Amino-1MQ — 10mg vial</option>
  <option value="10">SLU-PP-332 — 10mg vial</option>
@@ -417,7 +421,7 @@ select option{background:#1a1a28}
  </optgroup>
  <optgroup label="GH / Anti-aging">
   <option>Ipamorelin</option><option>CJC-1295 (no DAC)</option><option>CJC-1295 DAC</option>
-  <option>Ipamorelin / CJC blend</option><option>Sermorelin</option>
+  <option>Ipamorelin / CJC blend</option><option>Ipa + CJC 1295</option><option>Sermorelin</option>
   <option>Tesamorelin</option><option>Epithalon</option>
  </optgroup>
  <optgroup label="Cognitive / Mood">
@@ -431,7 +435,7 @@ select option{background:#1a1a28}
  </optgroup>
  <optgroup label="Other">
   <option>PT-141</option><option>Melanotan II</option>
-  <option>NAD+</option><option>KPV</option>
+  <option>NAD+</option><option>KPV</option><option>DSIP</option>
  </optgroup>
  <optgroup label="Blends">
   <option>Glow Blend</option><option>Klow Blend</option>
@@ -828,6 +832,7 @@ select option{background:#1a1a28}
  <!-- Other -->
  <div class="card shop-section" data-cat="other">
   <div class="ct">✨ Other</div>
+  <div class="prod-row"><div><div class="pname">DSIP 10mg</div><div class="pdose">Delta Sleep-Inducing Peptide, sueño profundo</div></div><div style="text-align:right"><div class="pprice">$65</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
   <div class="prod-row"><div><div class="pname">PT-141 10mg</div><div class="pdose">Melanocortin agonist, libido</div></div><div style="text-align:right"><div class="pprice">$60</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
   <div class="prod-row"><div><div class="pname">Bacteriostatic Water 10ml</div><div class="pdose">0.9% benzyl alcohol, sterile</div></div><div style="text-align:right"><div class="pprice">$14</div><button class="padd" onclick="orderWA(this)">+ Add</button></div></div>
  </div>
@@ -896,6 +901,7 @@ select option{background:#1a1a28}
    </optgroup>
  <optgroup label="GH / Anti-aging">
   <option value="Ipamorelin|5">Ipamorelin 5mg</option>
+  <option value="Ipa + CJC 1295|10">Ipa + CJC 1295 10mg</option>
   <option value="CJC-1295 (no DAC)|2">CJC-1295 (no DAC) 2mg</option><option value="CJC-1295 (no DAC)|5">CJC-1295 (no DAC) 5mg</option>
   <option value="CJC-1295 DAC|2">CJC-1295 DAC 2mg</option>
   <option value="Sermorelin|5">Sermorelin 5mg</option>
@@ -919,6 +925,7 @@ select option{background:#1a1a28}
   <option value="Melanotan II|10">Melanotan II 10mg</option>
   <option value="NAD+|500">NAD+ 500mg</option>
   <option value="KPV|5">KPV 5mg</option>
+  <option value="DSIP|10">DSIP 10mg</option>
  </optgroup>
  <optgroup label="Blends">
   <option value="Glow Blend|60">Glow Blend 60mg</option>
@@ -977,6 +984,7 @@ const TITRATION_PROTOCOLS={
  
  // ——— GH / Anti-aging ———
  'Ipamorelin':{vialMg:5,bacMl:2.5,intro:'Selective GH releaser. Cleanest GHRP — no cortisol or prolactin spike.',schedule:[{weeks:'Standard',dose:0.2,freq:'Daily',label:'200mcg (10u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. Stack with CJC-1295 for synergy.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
+ 'Ipa + CJC 1295':{vialMg:10,bacMl:2,intro:'Blend de Ipamorelin + CJC-1295. GH releaser diario. 5 días on / 2 off.',schedule:[{weeks:'Dosis diaria',dose:0.3,freq:'Daily — 5 on / 2 off',label:'300mcg — 6 units (10mg+2mL)'}],notes:'SubQ antes de dormir, estómago vacío. 5 días on / 2 días off.',warning:'10mg + 2mL BAC = 5mg/mL. 6 units por dosis.'},
  'CJC-1295 (no DAC)':{vialMg:5,bacMl:2.5,intro:'GHRH analog. Pairs with Ipamorelin for natural GH pulse.',schedule:[{weeks:'Standard',dose:0.1,freq:'Daily',label:'100–200mcg (10–20u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. 5 on / 2 off recommended.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
  'CJC-1295 DAC':{vialMg:2,bacMl:2,intro:'Long-acting CJC. Twice weekly only — do NOT take daily.',schedule:[{weeks:'Standard',dose:0.1,freq:'2x per week',label:'100mcg (20u with 2mg+2mL)'},{weeks:'Higher',dose:0.3,freq:'2x per week',label:'300mcg (30u)'}],notes:'SubQ — Monday & Thursday for example. Long half-life means continuous GH bump.',warning:'2mg + 2mL BAC = 1mg/mL. Never daily — desensitization risk.'},
  'Sermorelin':{vialMg:5,bacMl:2.5,intro:'GHRH analog — promotes natural GH release.',schedule:[{weeks:'Standard',dose:0.2,freq:'Daily',label:'200mcg (10u with 5mg+2.5mL)'}],notes:'SubQ before bed empty stomach. 5 on / 2 off, 8 weeks on / 4 weeks off.',warning:'5mg + 2.5mL BAC = 2mg/mL.'},
@@ -995,6 +1003,7 @@ const TITRATION_PROTOCOLS={
   'LL-37':{vialMg:5,bacMl:3,intro:'Antimicrobial peptide. Immune & gut support.',schedule:[{weeks:'Standard',dose:0.166,freq:'Daily',label:'166mcg (10u with 5mg+3mL)'}],notes:'SubQ — short cycles only.',warning:'5mg + 3mL BAC = 1.7mg/mL.'},
 
  // ——— Other ———
+ 'DSIP':{vialMg:10,bacMl:2,intro:'Delta Sleep-Inducing Peptide. Promueve sueño profundo y reparador.',schedule:[{weeks:'Dosis estándar',dose:0.25,freq:'Nightly',label:'250mcg — 5 units (10mg+2mL)'}],notes:'SubQ antes de dormir. Diario. 10mg + 2mL BAC = 5mg/mL. 5 unidades por dosis.',warning:'10mg + 2mL BAC = 5mg/mL. 5 units = 250mcg. Aplicar en la noche antes de dormir.'},
  'PT-141':{vialMg:10,bacMl:2,intro:'Melanocortin agonist for libido and arousal.',schedule:[{weeks:'As needed',dose:0.5,freq:'1–2h before activity',label:'500mcg–2mg (10–40u with 10mg+2mL)'}],notes:'SubQ 1–2h before activity. Start low.',warning:'10mg + 2mL BAC = 5mg/mL. Not for daily use.'},
  'Melanotan II':{vialMg:10,bacMl:3,intro:'Tanning peptide. Start very low — nausea common.',schedule:[{weeks:'Starter',dose:0.166,freq:'Daily',label:'166mcg (5u with 10mg+3mL)'}],notes:'SubQ. Start 0.5mg, titrate slowly. Sun exposure enhances effect.',warning:'10mg + 3mL BAC = 3.3mg/mL.'},
 
@@ -1021,6 +1030,7 @@ const PEP_PROTOCOLS={
  'Ipamorelin':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5mg + 2.5mL BAC.'},
  'CJC-1295 (no DAC)':{dose:'100mcg',freq:'Daily',notes:'SubQ before bed. 5mg + 2.5mL BAC. Stack with Ipamorelin.'},
  'Ipamorelin / CJC blend':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5 on / 2 off.'},
+ 'Ipa + CJC 1295':{dose:'300mcg',freq:'Daily — 5 on / 2 off',notes:'SubQ antes de dormir, estómago vacío. 10mg vial + 2mL BAC = 5mg/mL. 6 units. 5 días on / 2 días off.'},
  'CJC-1295 DAC':{dose:'100mcg',freq:'2x per week',notes:'SubQ. 2mg vial + 2mL BAC. NEVER daily — desensitization risk.'},
  'Sermorelin':{dose:'200mcg',freq:'Daily',notes:'SubQ before bed empty stomach. 5mg + 2.5mL BAC.'},
  'Tesamorelin':{dose:'1mg',freq:'Daily AM',notes:'AM fasted 30–60min before food. 10mg vial + 2mL BAC = 5mg/mL. 1 vial = 10 doses.'},
@@ -1039,9 +1049,10 @@ const PEP_PROTOCOLS={
  // Add-ons
  'NAD+':{dose:'75mg',freq:'Daily',notes:'SubQ slowly. 500mg vial + 2mL BAC = 250mg/mL. 30 units. 5 on / 2 off.'},
  'KPV':{dose:'500mcg',freq:'Daily',notes:'SubQ or oral. 5mg + 2mL BAC. Stack with BPC-157.'},
+ 'DSIP':{dose:'250mcg',freq:'Nightly',notes:'SubQ antes de dormir. 10mg + 2mL BAC = 5mg/mL. 5 units. Diario.'},
  // Blends (kept as-is for product compatibility)
  'Glow Blend':{dose:'4mg',freq:'Daily',notes:'SubQ daily. 60mg vial + 3mL BAC = 20mg/mL. 20u per dose. 5 days on / 2 days off.'},
- 'Klow Blend':{dose:'1 vial',freq:'2x per week',notes:'SubQ — Monday & Thursday.'},
+ 'Klow Blend':{dose:'5.33mg',freq:'Daily — 5 on / 2 off',notes:'SubQ daily. 80mg vial + 3mL BAC = 26.67mg/mL. 20 units. 5 days on / 2 days off.'},
 };
 
 const GOALS={
@@ -1051,7 +1062,7 @@ const GOALS={
  longevity:{label:'Anti-aging protocol',color:'#534AB7',stack:[{name:'Epithalon',dose:'1mg',freq:'Daily',sched:'Before bed. 10mg+2mL BAC = 5mg/mL. 20u. 5 on/2 off.',color:'#534AB7',units:20},{name:'GHK-Cu',dose:'1.25mg',freq:'Daily',sched:'SubQ abdomen. 50mg+2mL BAC = 25mg/mL. 5u.',color:'#1D9E75',units:5}],days:['M','T','W','T','F','S','S'],patterns:['done','done','off','today','sched','off','off']},
 };
 
-let activeGoal='recovery',vials=[],streak=0,todayDoses=[],checkedToday={},customStack=[],editMode=false;
+let activeGoal='recovery',vials=[],streak=0,todayDoses=[],checkedToday={},customStack=[],editMode=false,editingDoseIdx=null,editingVialIdx=null;
 
 function today(){return new Date().toISOString().slice(0,10);}
 
@@ -1152,7 +1163,7 @@ function switchMode(mode,btn){
 }
 
 function toggleEditMode(){
- editMode=!editMode;
+ editMode=!editMode;editingDoseIdx=null;
  const btn=document.getElementById('edit-btn'),addBox=document.getElementById('home-add-box'),buildBtn=document.getElementById('build-proto-btn');
  if(editMode){btn.textContent='Done';btn.style.background='rgba(29,158,117,.2)';btn.style.borderColor='rgba(29,158,117,.5)';btn.style.color='#5DCAA5';addBox.style.display='block';buildBtn.style.display='none';}
  else{btn.textContent='Edit';btn.style.background='rgba(26,111,196,.15)';btn.style.borderColor='rgba(26,111,196,.4)';btn.style.color='#3aa0ff';addBox.style.display='none';buildBtn.style.display='block';}
@@ -1164,6 +1175,23 @@ function homeAddPeptide(){
  const units=calcDoseUnits(name,detail,2);
  todayDoses.push({name,detail,units});save();renderHome();
  document.getElementById('home-pep-detail').value='';showToast(name+' added');
+}
+
+function homeEditPeptide(i){
+ editingDoseIdx=editingDoseIdx===i?null:i;
+ renderHome();
+ if(editingDoseIdx===i){setTimeout(()=>{const inp=document.getElementById('edit-dose-input-'+i);if(inp){inp.focus();inp.select();}},50);}
+}
+
+function homeUpdatePeptide(i){
+ const inp=document.getElementById('edit-dose-input-'+i);
+ if(!inp)return;
+ const detail=inp.value.trim()||'—';
+ const units=calcDoseUnits(todayDoses[i].name,detail,2);
+ todayDoses[i].detail=detail;
+ todayDoses[i].units=units;
+ editingDoseIdx=null;
+ save();renderHome();showToast('Dosis actualizada ✓');
 }
 
 function homeRemovePeptide(i){
@@ -1187,7 +1215,9 @@ function renderHome(){
  const done=checkedToday[i];
  const liveUnits=d.units||calcDoseUnits(d.name,d.detail,2);
  const unitsTag=liveUnits?`<span style="display:inline-block;background:rgba(26,111,196,.2);border:0.5px solid rgba(26,111,196,.5);border-radius:6px;padding:1px 7px;font-size:11px;font-weight:600;color:#3aa0ff;margin-left:6px">${liveUnits} units</span>`:'';
- return `<div class="dose-row ${done&&!editMode?'done':''}" style="margin-bottom:8px;border-left-color:${editMode?'#E24B4A':'#1a6fc4'}"><div style="flex:1"><div class="dn">${d.name}${unitsTag}</div><div class="dd">${d.detail}</div></div>${editMode?`<button onclick="homeRemovePeptide(${i})" style="background:rgba(226,75,74,.15);border:0.5px solid rgba(226,75,74,.4);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:#F09595;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0">× Remove</button>`:`<button class="chk ${done?'done':''}" onclick="checkDose(${i})">${done?'✓':'○'}</button>`}</div>`;
+ const isEditing=editMode&&editingDoseIdx===i;
+ const editForm=isEditing?`<div style="margin-top:8px;display:flex;gap:6px;align-items:center"><input id="edit-dose-input-${i}" type="text" value="${d.detail}" placeholder="ej: 2mg" style="flex:1;background:#1a1a28;border:0.5px solid #1a6fc4;border-radius:8px;color:#fff;padding:7px 10px;font-size:13px;outline:none;font-family:'Inter',sans-serif"><button onclick="homeUpdatePeptide(${i})" style="background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0">Guardar</button></div>`:""
+ return `<div class="dose-row ${done&&!editMode?'done':''}" style="margin-bottom:8px;border-left-color:${editMode?(isEditing?'#3aa0ff':'#E24B4A'):'#1a6fc4'}"><div style="flex:1"><div class="dn">${d.name}${unitsTag}</div><div class="dd">${d.detail}</div>${editForm}</div>${editMode?`<div style="display:flex;gap:5px;flex-shrink:0"><button onclick="homeEditPeptide(${i})" style="background:rgba(26,111,196,.15);border:0.5px solid rgba(26,111,196,.4);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:#3aa0ff;cursor:pointer;font-family:'Inter',sans-serif">${isEditing?'✕':'✏️'}</button><button onclick="homeRemovePeptide(${i})" style="background:rgba(226,75,74,.15);border:0.5px solid rgba(226,75,74,.4);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:#F09595;cursor:pointer;font-family:'Inter',sans-serif">×</button></div>`:`<button class="chk ${done?'done':''}" onclick="checkDose(${i})">${done?'✓':'○'}</button>`}</div>`;
  }).join('');
 }
 
@@ -1379,11 +1409,38 @@ function renderTracker(){
  const barColor=pct>40?'#1D9E75':pct>15?'#BA7517':'#E24B4A';
  const badge=pct>40?'<span class="pill pill-ok">OK</span>':pct>15?'<span class="pill pill-warn">Low</span>':'<span class="pill pill-low">Order now</span>';
  const unitsTag=v.units?`<span style="display:inline-block;background:rgba(26,111,196,.2);border:0.5px solid rgba(26,111,196,.5);border-radius:6px;padding:1px 7px;font-size:10px;font-weight:600;color:#3aa0ff;margin-left:6px">${v.units}u/dose</span>`:'';
- return `<div class="vrow"><div class="vic">${v.name.slice(0,2).toUpperCase()}</div><div class="vi"><div class="vn">${v.name}${unitsTag}${badge}<button onclick="deleteVial(${i})" style="background:none;border:none;color:rgba(255,255,255,.25);font-size:14px;cursor:pointer;padding:2px 6px;margin-left:4px;line-height:1" title="Delete vial">×</button></div><div class="vd">${left} of ${v.total} doses remaining</div><div class="pb"><div class="pf" style="width:${pct}%;background:${barColor}"></div></div></div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0"><button class="rbtn" onclick="logDose(${i})">Use</button>${pct<=20?`<button class="rbtn" onclick="window.open('https://healpeptides.net','_blank')">Order</button>`:''}</div></div>`;
+ const isEditingVial=editingVialIdx===i;
+ const vialEditForm=isEditingVial?`<div style="margin-top:8px;display:flex;gap:6px;align-items:center"><span style="font-size:11px;color:rgba(255,255,255,.4);white-space:nowrap">Unidades/dosis:</span><input id="edit-vial-units-${i}" type="number" value="${v.units||20}" min="1" max="100" style="width:64px;background:#1a1a28;border:0.5px solid #1a6fc4;border-radius:8px;color:#fff;padding:6px 8px;font-size:13px;outline:none;font-family:'Inter',sans-serif"><button onclick="updateVialUnits(${i})" style="background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0">OK</button></div>`:"";
+ return `<div class="vrow" style="flex-wrap:wrap"><div class="vic">${v.name.slice(0,2).toUpperCase()}</div><div class="vi" style="flex:1;min-width:0"><div class="vn">${v.name}${unitsTag}${badge}<button onclick="deleteVial(${i})" style="background:none;border:none;color:rgba(255,255,255,.25);font-size:14px;cursor:pointer;padding:2px 6px;margin-left:4px;line-height:1" title="Delete vial">×</button></div><div class="vd">${left} of ${v.total} doses remaining</div><div class="pb"><div class="pf" style="width:${pct}%;background:${barColor}"></div></div>${vialEditForm}</div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0"><button class="rbtn" onclick="logDose(${i})">Use</button><button class="rbtn" onclick="editVial(${i})" style="color:${isEditingVial?'#5DCAA5':'#3aa0ff'};border-color:${isEditingVial?'rgba(29,158,117,.5)':'rgba(26,111,196,.35)'}">${isEditingVial?'✕ Cerrar':'✏️ Editar'}</button>${pct<=20?`<button class="rbtn" onclick="window.open('https://healpeptides.net','_blank')">Order</button>`:''}</div></div>`;
  }).join('');
 }
 
 function logDose(i){if(vials[i].used<vials[i].total){vials[i].used++;save();renderTracker();showToast('Dose logged for '+vials[i].name.split(' ')[0]);}else{showToast('Vial empty — time to reorder!');}}
+
+function editVial(i){
+ editingVialIdx=editingVialIdx===i?null:i;
+ renderTracker();
+ if(editingVialIdx===i){setTimeout(()=>{const inp=document.getElementById('edit-vial-units-'+i);if(inp){inp.focus();inp.select();}},50);}
+}
+
+function updateVialUnits(i){
+ const inp=document.getElementById('edit-vial-units-'+i);
+ if(!inp)return;
+ const u=parseInt(inp.value);
+ if(u>0&&u<=100){
+  const v=vials[i];
+  const bacMl=v.bacMl||2;
+  const vialMg=v.doseMg?Math.round(v.total*v.doseMg):10;
+  const newDoseMg=(u/100)*(vialMg/bacMl);
+  const newTotal=Math.floor(vialMg/newDoseMg);
+  v.units=u;
+  v.doseMg=newDoseMg;
+  v.total=newTotal;
+  if(v.used>v.total)v.used=v.total;
+ }
+ editingVialIdx=null;
+ save();renderTracker();showToast('Vial actualizado ✓');
+}
 
 function deleteVial(i){
  if(!vials[i])return;
@@ -2434,6 +2491,10 @@ if('serviceWorker' in navigator){
     }
    })
    .catch(err=>console.warn('SW registration failed:',err));
+ });
+ // Reload when SW sends update signal
+ navigator.serviceWorker.addEventListener('message',event=>{
+  if(event.data&&event.data.type==='SW_UPDATED')window.location.reload();
  });
 }
 

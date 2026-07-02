@@ -1,5 +1,5 @@
 // HEAL Peptides — Service Worker
-const CACHE_NAME = 'heal-peptides-v2';
+const CACHE_NAME = 'heal-peptides-v4';
 const ASSETS = [
   '/',
   '/index.html',
@@ -22,7 +22,11 @@ self.addEventListener('activate', (event) => {
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
-  self.clients.claim();
+  self.clients.claim().then(() => {
+    self.clients.matchAll({type:'window'}).then(clients => {
+      clients.forEach(client => client.postMessage({type:'SW_UPDATED'}));
+    });
+  });
 });
 
 self.addEventListener('fetch', (event) => {
