@@ -894,7 +894,7 @@ select option{background:#1a1a28}
   <option value="Semaglutide|10">Semaglutide 10mg</option>
  </optgroup>
  <optgroup label="Recovery">
-  <option value="BPC-157|5">BPC-157 5mg</option><option value="BPC-157|15">BPC-157 15mg</option>
+  <option value="BPC-157|5">BPC-157 5mg</option><option value="BPC-157|10">BPC-157 10mg</option><option value="BPC-157|15">BPC-157 15mg</option>
   <option value="TB-500|2">TB-500 2mg</option><option value="TB-500|5">TB-500 5mg</option>
   <option value="GHK-Cu|50">GHK-Cu 50mg</option>
   <option value="IGF-1 LR3|1">IGF-1 LR3 1mg</option>
@@ -977,7 +977,7 @@ const TITRATION_PROTOCOLS={
   'Semaglutide':{vialMg:10,bacMl:2,intro:'GLP-1 receptor agonist. Weekly injection. Gradual titration over 3–4 months.',schedule:[{weeks:'Week 1–4',dose:0.25,freq:'Once weekly',label:'0.25mg (5u)'},{weeks:'Week 5–8',dose:0.5,freq:'Once weekly',label:'0.5mg (10u)'},{weeks:'Week 9–12',dose:1.0,freq:'Once weekly',label:'1.0mg (20u)'},{weeks:'Week 13+',dose:1.7,freq:'Once weekly',label:'1.7mg (34u)'},{weeks:'Maintenance',dose:2.4,freq:'Once weekly',label:'2.4mg max (48u)'}],notes:'SubQ — abdomen, thigh or upper arm. Same day each week.',warning:'Vial 10mg + 2mL BAC = 5mg/mL. Nausea common at start. Stay hydrated.'},
 
  // ——— Recovery / Healing ———
- 'BPC-157':{vialMg:10,bacMl:2,intro:'Body Protection Compound. SubQ near injury or abdomen. 4–6 week cycles.',schedule:[{weeks:'Standard dose',dose:1.25,freq:'Daily',label:'1250mcg (25u with 10mg+2mL)'},{weeks:'Lower dose',dose:0.5,freq:'Daily',label:'500mcg (10u with 10mg+2mL)'}],notes:'SubQ as close to injury as possible, or abdomen for systemic effect. 5 days on / 2 days off, 4–6 weeks per cycle.',warning:'10mg + 2mL BAC = 5mg/mL.'},
+ 'BPC-157':{vialMg:10,bacMl:2,intro:'Body Protection Compound. SubQ en abdomen o cerca de la lesión. Ciclos de 4–6 semanas.',schedule:[{weeks:'Dosis HEAL (estándar)',dose:1.0,freq:'Nightly — 5 on / 2 off',label:'1000mcg — 20 units (10mg+2mL)'},{weeks:'Dosis alta',dose:1.25,freq:'Daily — 5 on / 2 off',label:'1250mcg — 25 units (10mg+2mL)'},{weeks:'Dosis baja',dose:0.5,freq:'Daily — 5 on / 2 off',label:'500mcg — 10 units (10mg+2mL)'}],notes:'SubQ en abdomen o cerca de la lesión. Noche. 5 días on / 2 días off. 4–6 semanas por ciclo.',warning:'10mg + 2mL BAC = 5mg/mL. 20 units = 1mg = 1000mcg. Aplicar en la noche.'},
  'TB-500':{vialMg:10,bacMl:2,intro:'Tissue regeneration peptide. Pairs well with BPC-157 for recovery.',schedule:[{weeks:'Standard',dose:1.5,freq:'Mon / Wed / Fri',label:'1.5mg (30u with 10mg+2mL)'}],notes:'SubQ or IM. Monday, Wednesday and Friday.',warning:'10mg + 2mL BAC = 5mg/mL.'},
  'GHK-Cu':{vialMg:50,bacMl:2,intro:'Copper peptide. Skin & hair regeneration.',schedule:[{weeks:'Standard',dose:1.25,freq:'Daily',label:'1.25mg (5u with 50mg+2mL)'}],notes:'SubQ abdomen or scalp area. Daily.',warning:'50mg + 2mL BAC = 25mg/mL.'},
  'IGF-1 LR3':{vialMg:1,bacMl:2.5,intro:'Long-acting IGF-1 analog. Tissue growth and recovery.',schedule:[{weeks:'Standard',dose:0.04,freq:'Daily',label:'40–80mcg (10–20u with 1mg+2.5mL)'}],notes:'SubQ — 5 days on / 2 days off, 2.5–5 weeks per cycle.',warning:'1mg + 2.5mL BAC = 0.4mg/mL.'},
@@ -1022,7 +1022,7 @@ const PEP_PROTOCOLS={
  'Mazdutide':{dose:'2mg',freq:'Weekly',notes:'SubQ weekly. 10mg vial + 2mL BAC. Max 4mg/wk.'},
   'Semaglutide':{dose:'0.25mg',freq:'Weekly',notes:'SubQ weekly. 10mg + 2mL BAC. Titrate to 2.4mg max.'},
  // Recovery
- 'BPC-157':{dose:'1250mcg',freq:'Daily',notes:'SubQ near injury or abdomen. 10mg vial + 2mL BAC = 5mg/mL. 25 units. 5 on / 2 off, 4–6wk.'},
+ 'BPC-157':{dose:'1000mcg',freq:'Nightly — 5 on / 2 off',notes:'SubQ abdomen o cerca de la lesión. 10mg + 2mL BAC = 5mg/mL. 20 units. Noche. 5 días on / 2 días off.'},
  'TB-500':{dose:'1.5mg',freq:'Mon / Wed / Fri',notes:'SubQ or IM. 10mg vial + 2mL BAC = 5mg/mL. 30 units. Monday, Wednesday and Friday.'},
  'GHK-Cu':{dose:'1.25mg',freq:'Daily',notes:'SubQ abdomen. 50mg vial + 2mL BAC = 25mg/mL. 5 units.'},
  'IGF-1 LR3':{dose:'40mcg',freq:'Daily',notes:'SubQ. 1mg vial + 2.5mL BAC. 5 on / 2 off, 2.5–5 weeks.'},
