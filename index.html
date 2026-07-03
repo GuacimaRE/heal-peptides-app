@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="app-version" content="9">
+<meta name="app-version" content="10">
 <script>fetch('/version.json?nc='+Date.now()).then(r=>r.json()).then(d=>{const cur=parseInt(document.querySelector('meta[name=app-version]').content);if(d.v>cur){if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(regs=>{regs.forEach(r=>r.unregister());});caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k))));}setTimeout(()=>location.reload(true),200);}}).catch(()=>{});</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1127,7 +1127,7 @@ function autofillHome(){
 function load(){
  try{vials=JSON.parse(localStorage.getItem('heal-vials')||'[]');}catch(e){vials=[];}
  try{const s=JSON.parse(localStorage.getItem('heal-streak')||'{}');streak=s.count||0;}catch(e){streak=0;}
- try{const td=JSON.parse(localStorage.getItem('heal-today')||'{}');if(td.date===today()){todayDoses=td.doses||[];checkedToday=td.checked||{};}}catch(e){}
+ try{const td=JSON.parse(localStorage.getItem('heal-today')||'{}');todayDoses=td.doses||[];if(td.date===today()){checkedToday=td.checked||{};}}catch(e){}
  try{const g=localStorage.getItem('heal-goal');if(g)activeGoal=g;}catch(e){}
  try{customStack=JSON.parse(localStorage.getItem('heal-custom')||'[]');}catch(e){customStack=[];}
  todayDoses=todayDoses.map(d=>{if(!d.units)d.units=calcDoseUnits(d.name,d.detail,2);return d;});
@@ -1135,7 +1135,7 @@ function load(){
 
 function save(){
  try{localStorage.setItem('heal-vials',JSON.stringify(vials));}catch(e){}
- try{localStorage.setItem('heal-streak',JSON.stringify({count:streak,date:today()}));}catch(e){}
+ try{localStorage.setItem('heal-streak',JSON.stringify({count:streak,date:today(),streakDate:today()}));}catch(e){}
  try{localStorage.setItem('heal-today',JSON.stringify({date:today(),doses:todayDoses,checked:checkedToday}));}catch(e){}
  try{localStorage.setItem('heal-goal',activeGoal);}catch(e){}
  try{localStorage.setItem('heal-custom',JSON.stringify(customStack));}catch(e){}
@@ -1224,7 +1224,9 @@ function renderHome(){
 function checkDose(i){
  checkedToday[i]=!checkedToday[i];
  const allDone=todayDoses.every((_,idx)=>checkedToday[idx]);
- if(allDone&&todayDoses.length>0){streak++;showToast('All doses done! Streak: Day '+streak);}
+ if(allDone&&todayDoses.length>0){
+  try{const s=JSON.parse(localStorage.getItem('heal-streak')||'{}');if(s.streakDate!==today()){streak++;showToast('All doses done! Day '+streak+' ✓');}}catch(e){streak++;showToast('All doses done! Day '+streak+' ✓');}
+ }
  save();renderHome();
 }
 
